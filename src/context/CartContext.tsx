@@ -14,6 +14,7 @@ interface CartContextType {
   cartItems: CartItem[];
   addToCart: (item: {id: string; name: string; price: number; emoji: string}) => void;
   removeFromCart: (id: string) => void;
+  clearCart: () => void;
   getTotalPrice: () => string;
   getTotalItems: () => number;
   getUniqueItemsCount: () => number;
@@ -83,6 +84,12 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({children}) 
     return Object.keys(cart).length;
   };
 
+  const clearCart = () => {
+    setCart({});
+    setItems({});
+    saveCartData({}, {});
+  };
+
   const cartItems: CartItem[] = Object.entries(cart).map(([id, quantity]) => ({
     id,
     quantity,
@@ -90,7 +97,7 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({children}) 
   }));
 
   return (
-    <CartContext.Provider value={{cart, cartItems, addToCart, removeFromCart, getTotalPrice, getTotalItems, getUniqueItemsCount}}>
+    <CartContext.Provider value={{cart, cartItems, addToCart, removeFromCart, clearCart, getTotalPrice, getTotalItems, getUniqueItemsCount}}>
       {children}
     </CartContext.Provider>
   );

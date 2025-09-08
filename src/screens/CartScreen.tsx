@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,16 +8,36 @@ import {
   ScrollView,
   TextInput,
   Modal,
+  Alert,
 } from 'react-native';
 import {useTheme} from '../context/ThemeContext';
 import {useCart} from '../context/CartContext';
 import DatePicker from '../components/DatePicker';
+import { RazorpayService } from '../services/RazorpayService';
+import {preventScreenshot, allowScreenshot} from '../utils/ScreenshotPrevention';
+import { PaymentAppDetector, PaymentApp } from '../utils/PaymentAppDetector';
 
 // <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBkCIKQZ1ydCbRHBrXmC8hUh2dsrnCDEWI&amp;libraries=places"></script>;
 
 const CartScreen = () => {
   const {colors} = useTheme();
-  const {cartItems, addToCart, removeFromCart, getTotalPrice} = useCart();
+
+  useEffect(() => {
+    preventScreenshot();
+    loadInstalledPaymentApps();
+    return () => allowScreenshot();
+  }, []);
+
+  const loadInstalledPaymentApps = async () => {
+    try {
+      const apps = await PaymentAppDetector.getInstalledPaymentApps();
+      setInstalledPaymentApps(apps);
+    } catch (error) {
+      console.error('Error loading payment apps:', error);
+    }
+  };
+  const {cartItems, addToCart, removeFromCart, clearCart, getTotalPrice} =
+    useCart();
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedCoupon, setSelectedCoupon] = useState<string>('');
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
@@ -25,13 +45,45 @@ const CartScreen = () => {
     useState<boolean>(false);
   const [customInstruction, setCustomInstruction] = useState<string>('');
   const [showPaymentOptions, setShowPaymentOptions] = useState<boolean>(false);
+  const [showUPIOptions, setShowUPIOptions] = useState<boolean>(false);
+  const [showWalletOptions, setShowWalletOptions] = useState<boolean>(false);
+  const [showBankOptions, setShowBankOptions] = useState<boolean>(false);
+  const [installedPaymentApps, setInstalledPaymentApps] = useState<PaymentApp[]>([]);
+  const [showCardForm, setShowCardForm] = useState<boolean>(false);
+  const [cardDetails, setCardDetails] = useState({
+    number: '',
+    expiry: '',
+    cvv: '',
+    name: '',
+  });
 
   const paymentOptions = [
-    {id: 'phonepe', name: 'PhonePe', icon: '📱'},
-    {id: 'paytm', name: 'Paytm', icon: '💳'},
-    {id: 'googlepay', name: 'Google Pay', icon: '🔵'},
-    {id: 'debit', name: 'Debit Card', icon: '💳'},
-    {id: 'credit', name: 'Credit Card', icon: '💎'},
+    {id: 'card', name: 'Credit/Debit Card', icon: '💳'},
+    {id: 'upi', name: 'UPI', icon: '📱'},
+    {id: 'wallet', name: 'Wallets', icon: '👛'},
+    {id: 'netbanking', name: 'Net Banking', icon: '🏦'},
+    {id: 'cod', name: 'Cash on Delivery', icon: '💵'},
+  ];
+
+  const upiOptions = [
+    {id: 'gpay', name: 'Google Pay', icon: '🟢'},
+    {id: 'phonepe', name: 'PhonePe', icon: '🟣'},
+    {id: 'paytm', name: 'Paytm', icon: '🔵'},
+    {id: 'upi_id', name: 'Enter UPI ID', icon: '📱'},
+  ];
+
+  const walletOptions = [
+    {id: 'paytm_wallet', name: 'Paytm Wallet', icon: '🔵'},
+    {id: 'mobikwik', name: 'MobiKwik', icon: '🔴'},
+    {id: 'freecharge', name: 'FreeCharge', icon: '🟡'},
+    {id: 'amazon_pay', name: 'Amazon Pay', icon: '🟠'},
+  ];
+
+  const bankOptions = [
+    {id: 'sbi', name: 'State Bank of India', icon: '🏦'},
+    {id: 'hdfc', name: 'HDFC Bank', icon: '🏦'},
+    {id: 'icici', name: 'ICICI Bank', icon: '🏦'},
+    {id: 'axis', name: 'Axis Bank', icon: '🏦'},
   ];
 
   const timeSlots = [
@@ -88,6 +140,188 @@ const CartScreen = () => {
       month: date.toLocaleDateString('en-US', {month: 'short'}),
       year: date.getFullYear(),
     };
+  };
+
+  const handlePaymentMethod = async (methodId: string) => {
+    setShowPaymentOptions(false);
+    
+    if (methodId === 'card') {
+      setShowCardForm(true);
+    } else if (methodId === 'upi') {
+      setShowUPIOptions(true);
+    } else if (methodId === 'wallet') {
+      setShowWalletOptions(true);
+    } else if (methodId === 'netbanking') {
+      setShowBankOptions(true);
+    } else if (methodId === 'cod') {
+      await processCODPayment();
+    }
+  };
+
+  const handleUPIMethod = async (methodId: string) => {
+    setShowUPIOptions(false);
+    await processUPIPayment(methodId);
+  };
+
+  const handleWalletMethod = async (methodId: string) => {
+    setShowWalletOptions(false);
+    await processWalletPayment(methodId);
+  };
+
+  const handleBankMethod = async (methodId: string) => {
+    setShowBankOptions(false);
+    await processBankPayment(methodId);
+  };
+
+  const processCardPayment = async () => {
+    if (!validateCardDetails()) return;
+    
+    const finalAmount = getFinalAmount();
+    const maskedCard = cardDetails.number.replace(/.(?=.{4})/g, '*');
+    
+    Alert.alert(
+      'Payment Successful!',
+      `Card payment completed!\nCard: ${maskedCard}\nAmount: ₹${finalAmount}\nTransaction ID: CARD${Date.now()}`,
+      [{text: 'OK', onPress: () => {
+        clearCart();
+        setShowCardForm(false);
+        setCardDetails({number: '', expiry: '', cvv: '', name: ''});
+      }}]
+    );
+  };
+
+  const validateCardDetails = () => {
+    if (!cardDetails.number || cardDetails.number.length < 16) {
+      Alert.alert('Error', 'Please enter a valid 16-digit card number');
+      return false;
+    }
+    if (!cardDetails.expiry || !/^\d{2}\/\d{2}$/.test(cardDetails.expiry)) {
+      Alert.alert('Error', 'Please enter expiry in MM/YY format');
+      return false;
+    }
+    if (!cardDetails.cvv || cardDetails.cvv.length < 3) {
+      Alert.alert('Error', 'Please enter a valid CVV');
+      return false;
+    }
+    if (!cardDetails.name.trim()) {
+      Alert.alert('Error', 'Please enter cardholder name');
+      return false;
+    }
+    return true;
+  };
+
+  const formatCardNumber = (text: string) => {
+    const cleaned = text.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    const matches = cleaned.match(/\d{4,16}/g);
+    const match = matches && matches[0] || '';
+    const parts = [];
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4));
+    }
+    if (parts.length) {
+      return parts.join(' ');
+    } else {
+      return match;
+    }
+  };
+
+  const formatExpiry = (text: string) => {
+    const cleaned = text.replace(/\D/g, '');
+    if (cleaned.length >= 2) {
+      return cleaned.substring(0, 2) + '/' + cleaned.substring(2, 4);
+    }
+    return cleaned;
+  };
+
+  const processUPIPayment = async (method: string) => {
+    const finalAmount = getFinalAmount();
+    const methodName = upiOptions.find(opt => opt.id === method)?.name || 'UPI';
+    Alert.alert(
+      'Payment Successful!',
+      `${methodName} payment completed!\nAmount: ₹${finalAmount}\nTransaction ID: UPI${Date.now()}`,
+      [{text: 'OK', onPress: () => clearCart()}]
+    );
+  };
+
+  const processWalletPayment = async (method: string) => {
+    const finalAmount = getFinalAmount();
+    const methodName = walletOptions.find(opt => opt.id === method)?.name || 'Wallet';
+    Alert.alert(
+      'Payment Successful!',
+      `${methodName} payment completed!\nAmount: ₹${finalAmount}\nTransaction ID: WAL${Date.now()}`,
+      [{text: 'OK', onPress: () => clearCart()}]
+    );
+  };
+
+  const processBankPayment = async (method: string) => {
+    const finalAmount = getFinalAmount();
+    const methodName = bankOptions.find(opt => opt.id === method)?.name || 'Net Banking';
+    Alert.alert(
+      'Payment Successful!',
+      `${methodName} payment completed!\nAmount: ₹${finalAmount}\nTransaction ID: NB${Date.now()}`,
+      [{text: 'OK', onPress: () => clearCart()}]
+    );
+  };
+
+  const processCODPayment = async () => {
+    const finalAmount = getFinalAmount();
+    Alert.alert(
+      'Order Confirmed!',
+      `Cash on Delivery order placed!\nAmount: ₹${finalAmount}\nOrder ID: COD${Date.now()}`,
+      [{text: 'OK', onPress: () => clearCart()}]
+    );
+  };
+
+  const initiateRazorpayPayment = async () => {
+    if (cartItems.length === 0) {
+      Alert.alert('Error', 'Your cart is empty');
+      return;
+    }
+
+    try {
+      const finalAmount = getFinalAmount();
+      const amountInRupees = parseFloat(finalAmount);
+
+      if (amountInRupees < 1) {
+        Alert.alert('Error', 'Minimum payment amount is ₹1');
+        return;
+      }
+
+      const orderId = RazorpayService.generateOrderId();
+      // Use mock payment for now to avoid Razorpay configuration issues
+      const paymentResponse = await RazorpayService.mockPayment(amountInRupees, orderId);
+
+      Alert.alert(
+        'Payment Successful!',
+        `Payment completed successfully!\nAmount: ₹${finalAmount}\nPayment ID: ${paymentResponse.razorpay_payment_id}\nOrder ID: ${paymentResponse.razorpay_order_id}`,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('Order placed successfully');
+              clearCart();
+            },
+          },
+        ],
+      );
+    } catch (error: any) {
+      if (error.message.includes('cancelled')) {
+        Alert.alert('Payment Cancelled', 'Payment was cancelled by user');
+      } else {
+        Alert.alert('Payment Failed', error.message || 'Something went wrong');
+      }
+    }
+  };
+
+  const getFinalAmount = () => {
+    if (!selectedCoupon) return (totalAmount + deliveryCharge).toFixed(2);
+    const coupon = coupons.find(c => c.id === selectedCoupon);
+    if (!coupon) return (totalAmount + deliveryCharge).toFixed(2);
+    const discount =
+      coupon.title === 'FLAT50'
+        ? coupon.discount
+        : Math.round((totalAmount * coupon.discount) / 100);
+    return (totalAmount - discount + deliveryCharge).toFixed(2);
   };
 
   const renderCartItem = ({item}: {item: any}) => (
@@ -360,7 +594,7 @@ const CartScreen = () => {
           <TouchableOpacity
             style={[styles.paymentButton, {backgroundColor: colors.primary}]}
             onPress={() => setShowPaymentOptions(true)}>
-            <Text style={styles.paymentButtonText}>Payment</Text>
+            <Text style={styles.paymentButtonText}>Choose Payment Method</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -384,10 +618,7 @@ const CartScreen = () => {
                   styles.paymentOption,
                   {borderColor: colors.text + '20'},
                 ]}
-                onPress={() => {
-                  console.log('Selected:', option.name);
-                  setShowPaymentOptions(false);
-                }}>
+                onPress={() => handlePaymentMethod(option.id)}>
                 <Text style={styles.paymentIcon}>{option.icon}</Text>
                 <Text style={[styles.paymentName, {color: colors.text}]}>
                   {option.name}
@@ -401,6 +632,186 @@ const CartScreen = () => {
               <Text style={[styles.cancelText, {color: colors.primary}]}>
                 Cancel
               </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* UPI Options Modal */}
+      <Modal
+        visible={showUPIOptions}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowUPIOptions(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.paymentModal, {backgroundColor: colors.surface}]}>
+            <Text style={[styles.modalTitle, {color: colors.text}]}>Select UPI Method</Text>
+            {installedPaymentApps
+              .filter(app => ['Google Pay', 'PhonePe', 'Paytm', 'BHIM'].includes(app.name))
+              .map((app) => (
+                <TouchableOpacity
+                  key={app.name}
+                  style={[styles.paymentOption, {borderColor: colors.text + '20', backgroundColor: '#e8f5e8'}]}
+                  onPress={() => {
+                    PaymentAppDetector.openPaymentApp(app.scheme);
+                    handleUPIMethod(app.name.toLowerCase().replace(' ', ''));
+                  }}>
+                  <Text style={styles.paymentIcon}>✅</Text>
+                  <Text style={[styles.paymentName, {color: colors.text}]}>{app.name}</Text>
+                </TouchableOpacity>
+              ))}
+            <TouchableOpacity
+              style={[styles.paymentOption, {borderColor: colors.text + '20'}]}
+              onPress={() => handleUPIMethod('upi_id')}>
+              <Text style={styles.paymentIcon}>📱</Text>
+              <Text style={[styles.paymentName, {color: colors.text}]}>Enter UPI ID</Text>
+            </TouchableOpacity>
+            {installedPaymentApps.filter(app => ['Google Pay', 'PhonePe', 'Paytm', 'BHIM'].includes(app.name)).length === 0 && (
+              <Text style={[styles.noAppsText, {color: colors.text}]}>No UPI apps detected</Text>
+            )}
+            <TouchableOpacity
+              style={[styles.cancelButton, {borderColor: colors.primary}]}
+              onPress={() => setShowUPIOptions(false)}>
+              <Text style={[styles.cancelText, {color: colors.primary}]}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Wallet Options Modal */}
+      <Modal
+        visible={showWalletOptions}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowWalletOptions(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.paymentModal, {backgroundColor: colors.surface}]}>
+            <Text style={[styles.modalTitle, {color: colors.text}]}>Select Wallet</Text>
+            {installedPaymentApps
+              .filter(app => ['Paytm', 'MobiKwik', 'FreeCharge', 'Amazon Pay'].includes(app.name))
+              .map((app) => (
+                <TouchableOpacity
+                  key={app.name}
+                  style={[styles.paymentOption, {borderColor: colors.text + '20', backgroundColor: '#fff3e0'}]}
+                  onPress={() => {
+                    PaymentAppDetector.openPaymentApp(app.scheme);
+                    handleWalletMethod(app.name.toLowerCase().replace(' ', ''));
+                  }}>
+                  <Text style={styles.paymentIcon}>✅</Text>
+                  <Text style={[styles.paymentName, {color: colors.text}]}>{app.name}</Text>
+                </TouchableOpacity>
+              ))}
+            {installedPaymentApps.filter(app => ['Paytm', 'MobiKwik', 'FreeCharge', 'Amazon Pay'].includes(app.name)).length === 0 && (
+              <Text style={[styles.noAppsText, {color: colors.text}]}>No wallet apps detected</Text>
+            )}
+            <TouchableOpacity
+              style={[styles.cancelButton, {borderColor: colors.primary}]}
+              onPress={() => setShowWalletOptions(false)}>
+              <Text style={[styles.cancelText, {color: colors.primary}]}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Bank Options Modal */}
+      <Modal
+        visible={showBankOptions}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowBankOptions(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.paymentModal, {backgroundColor: colors.surface}]}>
+            <Text style={[styles.modalTitle, {color: colors.text}]}>Select Bank</Text>
+            {installedPaymentApps
+              .filter(app => ['SBI Pay', 'HDFC PayZapp', 'ICICI Pockets', 'Axis Pay'].includes(app.name))
+              .map((app) => (
+                <TouchableOpacity
+                  key={app.name}
+                  style={[styles.paymentOption, {borderColor: colors.text + '20', backgroundColor: '#e3f2fd'}]}
+                  onPress={() => {
+                    PaymentAppDetector.openPaymentApp(app.scheme);
+                    handleBankMethod(app.name.toLowerCase().replace(' ', ''));
+                  }}>
+                  <Text style={styles.paymentIcon}>✅</Text>
+                  <Text style={[styles.paymentName, {color: colors.text}]}>{app.name}</Text>
+                </TouchableOpacity>
+              ))}
+            <TouchableOpacity
+              style={[styles.paymentOption, {borderColor: colors.text + '20'}]}
+              onPress={() => handleBankMethod('netbanking')}>
+              <Text style={styles.paymentIcon}>🏦</Text>
+              <Text style={[styles.paymentName, {color: colors.text}]}>Other Net Banking</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.cancelButton, {borderColor: colors.primary}]}
+              onPress={() => setShowBankOptions(false)}>
+              <Text style={[styles.cancelText, {color: colors.primary}]}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Card Payment Form Modal */}
+      <Modal
+        visible={showCardForm}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowCardForm(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.cardModal, {backgroundColor: colors.surface}]}>
+            <Text style={[styles.modalTitle, {color: colors.text}]}>Enter Card Details</Text>
+            
+            <TextInput
+              style={[styles.cardInput, {borderColor: colors.primary, color: colors.text}]}
+              placeholder="Card Number"
+              placeholderTextColor={colors.text + '60'}
+              value={cardDetails.number}
+              onChangeText={(text) => setCardDetails({...cardDetails, number: formatCardNumber(text)})}
+              keyboardType="numeric"
+              maxLength={19}
+            />
+            
+            <View style={styles.cardRow}>
+              <TextInput
+                style={[styles.cardInputHalf, {borderColor: colors.primary, color: colors.text}]}
+                placeholder="MM/YY"
+                placeholderTextColor={colors.text + '60'}
+                value={cardDetails.expiry}
+                onChangeText={(text) => setCardDetails({...cardDetails, expiry: formatExpiry(text)})}
+                keyboardType="numeric"
+                maxLength={5}
+              />
+              <TextInput
+                style={[styles.cardInputHalf, {borderColor: colors.primary, color: colors.text}]}
+                placeholder="CVV"
+                placeholderTextColor={colors.text + '60'}
+                value={cardDetails.cvv}
+                onChangeText={(text) => setCardDetails({...cardDetails, cvv: text.replace(/\D/g, '')})}
+                keyboardType="numeric"
+                maxLength={4}
+                secureTextEntry
+              />
+            </View>
+            
+            <TextInput
+              style={[styles.cardInput, {borderColor: colors.primary, color: colors.text}]}
+              placeholder="Cardholder Name"
+              placeholderTextColor={colors.text + '60'}
+              value={cardDetails.name}
+              onChangeText={(text) => setCardDetails({...cardDetails, name: text.toUpperCase()})}
+              autoCapitalize="characters"
+            />
+            
+            <TouchableOpacity
+              style={[styles.payButton, {backgroundColor: colors.primary}]}
+              onPress={processCardPayment}>
+              <Text style={styles.payButtonText}>Pay ₹{getFinalAmount()}</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={[styles.cancelButton, {borderColor: colors.primary}]}
+              onPress={() => setShowCardForm(false)}>
+              <Text style={[styles.cancelText, {color: colors.primary}]}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -613,6 +1024,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
+    fontStyle: 'italic',
   },
   modalOverlay: {
     flex: 1,
@@ -656,6 +1068,48 @@ const styles = StyleSheet.create({
   cancelText: {
     fontSize: 16,
     fontWeight: '600',
+    textAlign: 'center',
+  },
+  noAppsText: {
+    fontSize: 14,
+    textAlign: 'center',
+    opacity: 0.6,
+    padding: 20,
+  },
+  cardModal: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    minHeight: 400,
+  },
+  cardInput: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    fontSize: 16,
+  },
+  cardRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  cardInputHalf: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    fontSize: 16,
+    width: '48%',
+  },
+  payButton: {
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  payButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
     textAlign: 'center',
   },
 });

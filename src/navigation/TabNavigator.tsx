@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text} from 'react-native';
+import {Text, View} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useTheme} from '../context/ThemeContext';
 
@@ -9,11 +9,19 @@ import FlashDealScreen from '../screens/FlashDealScreen';
 import WalletScreen from '../screens/WalletScreen';
 import CartScreen from '../screens/CartScreen';
 import OrdersScreen from '../screens/OrdersScreen';
+import {useCart} from '../context/CartContext';
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   const {colors} = useTheme();
+  const {
+    cart,
+
+    getUniqueItemsCount,
+  } = useCart();
+
+  const cartCount = getUniqueItemsCount();
 
   return (
     <Tab.Navigator
@@ -59,15 +67,55 @@ const TabNavigator = () => {
           ),
         }}
       />
+
       <Tab.Screen
+        name="Cart"
+        component={CartScreen}
+        options={{
+          tabBarIcon: ({color}) => (
+            <React.Fragment>
+              <Text style={{fontSize: 20, color}}>🛒</Text>
+              {cartCount > 0 && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: -5,
+                    right: -12,
+                    backgroundColor: 'red',
+                    borderRadius: 10, // half of width/height
+                    minWidth: 20,
+                    height: 20,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingHorizontal: 3, // so "10+" fits
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                      fontSize: 10,
+                      fontWeight: 'bold',
+                    }}>
+                    {cartCount > 9 ? '10+' : cartCount}
+                  </Text>
+                </View>
+              )}
+            </React.Fragment>
+          ),
+        }}
+      />
+
+      {/* <Tab.Screen
         name="Cart"
         component={CartScreen}
         options={{
           tabBarIcon: ({color}) => (
             <Text style={{fontSize: 20, color}}>🛒</Text>
           ),
+
+          tabBarBadge:
+            cartCount > 0 ? (cartCount < 10 ? cartCount : '10+') : undefined,
         }}
-      />
+      /> */}
     </Tab.Navigator>
   );
 };

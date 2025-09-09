@@ -3,6 +3,7 @@
 const Constants = {
   API_BASE_URL: 'https://maps.googleapis.com/maps/api',
   GOOGLE_MAPS_KEY: 'AIzaSyBkCIKQZ1ydCbRHBrXmC8hUh2dsrnCDEWI',
+  CURRENT_LOCATION: 'https://maps.googleapis.com/maps/api/geocode/json?latlng=',
 
   APP_NAME: 'VegEase',
   WELCOME_MESSAGE: 'Welcome to VegEase!',

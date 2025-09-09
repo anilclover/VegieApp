@@ -1,8 +1,12 @@
 import React, {useEffect} from 'react';
 import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
+import { requestAllPermissions } from '../utils/PermissionManager';
 
-const SplashScreen = ({navigation}: any) => {
+const SplashScreen = ({ navigation }: any) => {
+  
   useEffect(() => {
+
+    initApp;
     const timer = setTimeout(() => {
       navigation.replace('Login'); // move to Login after 2s
     }, 2000);
@@ -10,6 +14,15 @@ const SplashScreen = ({navigation}: any) => {
     return () => clearTimeout(timer);
   }, [navigation]);
 
+
+    const initApp = async () => {
+      const hasPermissions = await requestAllPermissions();
+      if (hasPermissions) {
+        console.log('All permissions granted');
+      } else {
+        console.log('Some permissions denied');
+      }
+    };
   return (
     <View style={styles.container}>
       <Text style={styles.logo}>VegEase</Text>

@@ -13,6 +13,7 @@ import {
   ScrollView,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import {requestAllPermissions} from '../utils/PermissionManager';
 const {height} = Dimensions.get('window');
 
 const logos = [
@@ -34,6 +35,7 @@ const LoginScreen = () => {
       {iterations: -1},
     ).start();
   }, [scrollY]);
+
 
   return (
     <KeyboardAvoidingView

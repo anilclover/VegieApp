@@ -1,45 +1,37 @@
-import {Platform, PermissionsAndroid, Alert, NativeModules} from 'react-native';
+import {PermissionsAndroid, Platform, Alert} from 'react-native';
 
-const {PermissionModule} = NativeModules;
+/**
+ * Request multiple Android permissions at runtime.
+ * Returns true if all permissions are granted, false otherwise.
+ */
+export const requestAllPermissions = async (): Promise<boolean> => {
+  if (Platform.OS !== 'android') return true;
 
-const requestiOSPermissions = async () => {
   try {
-    if (PermissionModule) {
-      await PermissionModule.requestAllPermissions();
-    }
-  } catch (err) {
-    console.warn('iOS permission request error:', err);
-  }
-};
+    const permissions = [
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+      PermissionsAndroid.PERMISSIONS.SEND_SMS,
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    ];
 
-export const requestAllPermissions = async () => {
-  if (Platform.OS === 'android') {
-    try {
-      const permissions = [
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
-        PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-        PermissionsAndroid.PERMISSIONS.SEND_SMS,
-        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-      ];
+    const results = await PermissionsAndroid.requestMultiple(permissions);
 
-      const granted = await PermissionsAndroid.requestMultiple(permissions);
-      
-      const allGranted = Object.values(granted).every(
-        permission => permission === PermissionsAndroid.RESULTS.GRANTED
+    const allGranted = Object.values(results).every(
+      result => result === PermissionsAndroid.RESULTS.GRANTED,
+    );
+
+    if (!allGranted) {
+      Alert.alert(
+        'Permissions Required',
+        'Some permissions were denied. The app may not work properly.',
+        [{text: 'OK'}],
       );
-
-      if (!allGranted) {
-        Alert.alert(
-          'Permissions Required',
-          'Some permissions were denied. The app may not work properly.',
-          [{text: 'OK'}]
-        );
-      }
-    } catch (err) {
-      console.warn('Android permission request error:', err);
     }
-  } else if (Platform.OS === 'ios') {
-    await requestiOSPermissions();
+
+    return allGranted;
+  } catch (error) {
+    console.error('Permission request error:', error);
+    return false;
   }
 };

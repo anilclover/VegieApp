@@ -288,8 +288,17 @@ const CartScreen = () => {
       }
 
       const orderId = RazorpayService.generateOrderId();
-      // Use mock payment for now to avoid Razorpay configuration issues
-      const paymentResponse = await RazorpayService.mockPayment(amountInRupees, orderId);
+      const paymentResponse = await RazorpayService.initiatePayment({
+        amount: amountInRupees * 100,
+        currency: 'INR',
+        order_id: orderId,
+        name: 'VegieApp',
+        description: 'Grocery Order Payment',
+        prefill: {
+          email: 'customer@vegieapp.com',
+          contact: '+919191919191',
+        },
+      });
 
       Alert.alert(
         'Payment Successful!',
@@ -593,8 +602,8 @@ const CartScreen = () => {
 
           <TouchableOpacity
             style={[styles.paymentButton, {backgroundColor: colors.primary}]}
-            onPress={() => setShowPaymentOptions(true)}>
-            <Text style={styles.paymentButtonText}>Choose Payment Method</Text>
+            onPress={initiateRazorpayPayment}>
+            <Text style={styles.paymentButtonText}>Pay with Razorpay</Text>
           </TouchableOpacity>
         </View>
       )}

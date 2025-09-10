@@ -8,6 +8,7 @@ import {
   PermissionsAndroid,
   Platform,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {useTheme} from '../context/ThemeContext';
@@ -17,7 +18,6 @@ import {vegetables, fruits, oils, flashDeals} from '../data/products';
 
 import Geolocation from '@react-native-community/geolocation';
 import Constants from '../constants/Constants';
-// import Geolocation from 'react-native-geolocation-service';
 
 const VegEaseScreen = () => {
   const {colors} = useTheme();
@@ -26,83 +26,71 @@ const VegEaseScreen = () => {
   const navigation = useNavigation();
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState('Getting location...');
 
   useEffect(() => {
-    requestLocationPermission();
+    getCurrentLocation();
   }, []);
-
-  /**
-   * 🔹 Request location permission (Android only)
-   */
+  // Function to request location permission
   const requestLocationPermission = async () => {
-    setLoading(true);
-    setAddress('');
-
-    if (Platform.OS === 'android') {
+    if (Platform.OS === 'ios') {
+      return true; // iOS handles permissions automatically
+    } else if (Platform.OS === 'android') {
       try {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
             title: 'Location Permission',
-            message: 'This app needs access to your location.',
+            message:
+              'VegEase needs access to your location to find nearby products.',
             buttonNeutral: 'Ask Me Later',
             buttonNegative: 'Cancel',
             buttonPositive: 'OK',
           },
         );
-
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          getCurrentLocation();
-        } else {
-          setAddress('📍 Location access denied');
-          setLoading(false);
-        }
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
       } catch (err) {
         console.warn(err);
-        setAddress('📍 Permission error');
-        setLoading(false);
+        return false;
       }
-    } else {
-      getCurrentLocation(); // iOS handles its own permission prompt
     }
+    return false; // Fallback for other platforms
   };
 
-  /**
-   * 🔹 Get current latitude & longitude
-   */
-  const getCurrentLocation = () => {
+  // Function to get current location after permission check
+  const getCurrentLocation = async () => {
+    const hasPermission = await requestLocationPermission();
     setLoading(true);
-    setAddress('📍 Getting location...');
 
+    if (!hasPermission) {
+      setCurrentAddress('Location permission denied.');
+      return;
+    }
+
+    setCurrentAddress('Getting location...');
     Geolocation.getCurrentPosition(
       position => {
-        console.log('✅ Location success:', position);
-        let {latitude, longitude} = position.coords;
-        latitude = 19.157934;
-        longitude = 72.99205;
+        const {latitude, longitude} = position.coords;
+        console.log('Location found:', latitude, longitude);
         getAddressFromCoordinates(latitude, longitude);
       },
       error => {
-        console.log('❌ Location error:', error);
-        let errorMessage = '📍 Unable to get location';
-        switch (error.code) {
-          case 1:
-            errorMessage = '📍 Location access denied';
-            break;
-          case 2:
-            errorMessage = '📍 Location service unavailable';
-            break;
-          case 3:
-            errorMessage = '📍 Location request timed out';
-            break;
+        console.log('Location error:', error);
+        let errorMessage = 'Unable to get location.';
+        if (error.code === 1) {
+          errorMessage =
+            'Permission denied. Please enable location in app settings.';
+        } else if (error.code === 2) {
+          errorMessage = 'Location is unavailable. Check your device settings.';
+        } else if (error.code === 3) {
+          errorMessage = 'Location request timed out. Please try again.';
         }
-        setAddress(errorMessage);
-        setLoading(false);
+        setCurrentAddress(errorMessage);
       },
       {
-        enableHighAccuracy: true,
-        timeout: 60000, // allow 60s for GPS
-        maximumAge: 10000,
+        enableHighAccuracy: false,
+        timeout: 20000,
+        maximumAge: 60000,
       },
     );
   };
@@ -131,7 +119,7 @@ const VegEaseScreen = () => {
       console.log('📍 Address response:', data);
 
       if (data.results && data.results.length > 0) {
-        const fullAddress = data.results[0].formatted_address;
+        const fullAddress = data.results[5].formatted_address;
         setAddress(fullAddress);
       } else {
         setAddress('Address not found');

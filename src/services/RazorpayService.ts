@@ -25,36 +25,39 @@ export interface PaymentResponse {
 }
 
 export class RazorpayService {
-  private static readonly RAZORPAY_KEY = 'rzp_test_11Hg5CO4Hz3bhk'; // Valid test key
+  private static readonly RAZORPAY_KEY = 'rzp_test_11Hg5CO4Hz3bhk';
 
-  static async processPayment(
-    amount: number,
-    orderId: string,
-    customerDetails: {
-      name: string;
+  static async initiatePayment(options: {
+    amount: number;
+    currency: string;
+    order_id: string;
+    name: string;
+    description: string;
+    prefill: {
       email: string;
       contact: string;
-    }
-  ): Promise<PaymentResponse> {
-    const options: RazorpayOptions = {
-      description: 'VegieApp Order Payment',
-      currency: 'INR',
+    };
+  }): Promise<PaymentResponse> {
+    const razorpayOptions = {
+      description: options.description,
+      currency: options.currency,
       key: this.RAZORPAY_KEY,
-      amount: amount * 100, // Convert to paise
-      name: 'VegieApp',
+      amount: options.amount,
+      name: options.name,
+      order_id: options.order_id,
       prefill: {
-        email: customerDetails.email,
-        contact: customerDetails.contact,
-        name: customerDetails.name,
+        email: options.prefill.email,
+        contact: options.prefill.contact,
+        name: 'Customer',
       },
-      theme: { color: '#4CAF50' },
+      theme: { color: '#528FF0' },
     };
 
     try {
-      const data = await RazorpayCheckout.open(options);
+      const data = await RazorpayCheckout.open(razorpayOptions);
       return {
         razorpay_payment_id: data.razorpay_payment_id,
-        razorpay_order_id: data.razorpay_order_id || orderId,
+        razorpay_order_id: data.razorpay_order_id || options.order_id,
         razorpay_signature: data.razorpay_signature,
       };
     } catch (error: any) {
@@ -70,11 +73,32 @@ export class RazorpayService {
     return `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
+  static async processPayment(
+    amount: number,
+    orderId: string,
+    customerDetails: {
+      name: string;
+      email: string;
+      contact: string;
+    }
+  ): Promise<PaymentResponse> {
+    return this.initiatePayment({
+      amount: amount * 100,
+      currency: 'INR',
+      order_id: orderId,
+      name: 'VegieApp',
+      description: 'Grocery Order Payment',
+      prefill: {
+        email: customerDetails.email,
+        contact: customerDetails.contact,
+      },
+    });
+  }
+
   static async mockPayment(
     amount: number,
     orderId: string
   ): Promise<PaymentResponse> {
-    // Fallback mock payment for testing
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({

@@ -382,6 +382,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     overflow: 'hidden',
     justifyContent: 'space-between',
+    
   },
   cardContent: {padding: 12, alignItems: 'center', position: 'relative'},
   discountBadge: {

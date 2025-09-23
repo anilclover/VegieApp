@@ -6,6 +6,8 @@ import LoginScreen from '../screens/LoginScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import RegistrationScreen from '../screens/RegistrationScreen';
 import SplashScreen from '../screens/SplashScreen';
+import BiometricLoginScreen from '../screens/BiometricLoginScreen';
+import ChatScreen from '../screens/ChatScreen';
 
 const Stack = createStackNavigator();
 
@@ -13,11 +15,13 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Splash" component={SplashScreen} />
+      <Stack.Screen name="BiometricLogin" component={BiometricLoginScreen} />
       <Stack.Screen name="Main" component={TabNavigator} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="SearchScreen" component={SearchScreen} />
       <Stack.Screen name="Signup" component={RegistrationScreen} />
+      <Stack.Screen name="ChatScreen" component={ChatScreen} />
     </Stack.Navigator>
   );
 };

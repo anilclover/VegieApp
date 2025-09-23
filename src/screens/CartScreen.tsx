@@ -9,18 +9,24 @@ import {
   TextInput,
   Modal,
   Alert,
+  Button,
 } from 'react-native';
 import {useTheme} from '../context/ThemeContext';
 import {useCart} from '../context/CartContext';
 import DatePicker from '../components/DatePicker';
-import { RazorpayService } from '../services/RazorpayService';
-import {preventScreenshot, allowScreenshot} from '../utils/ScreenshotPrevention';
-import { PaymentAppDetector, PaymentApp } from '../utils/PaymentAppDetector';
+import {RazorpayService} from '../services/RazorpayService';
+import {
+  preventScreenshot,
+  allowScreenshot,
+} from '../utils/ScreenshotPrevention';
+import {PaymentAppDetector, PaymentApp} from '../utils/PaymentAppDetector';
+import {useNavigation} from '@react-navigation/native';
 
 // <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBkCIKQZ1ydCbRHBrXmC8hUh2dsrnCDEWI&amp;libraries=places"></script>;
 
 const CartScreen = () => {
   const {colors} = useTheme();
+  const navigation = useNavigation();
 
   useEffect(() => {
     preventScreenshot();
@@ -48,7 +54,9 @@ const CartScreen = () => {
   const [showUPIOptions, setShowUPIOptions] = useState<boolean>(false);
   const [showWalletOptions, setShowWalletOptions] = useState<boolean>(false);
   const [showBankOptions, setShowBankOptions] = useState<boolean>(false);
-  const [installedPaymentApps, setInstalledPaymentApps] = useState<PaymentApp[]>([]);
+  const [installedPaymentApps, setInstalledPaymentApps] = useState<
+    PaymentApp[]
+  >([]);
   const [showCardForm, setShowCardForm] = useState<boolean>(false);
   const [cardDetails, setCardDetails] = useState({
     number: '',
@@ -144,7 +152,7 @@ const CartScreen = () => {
 
   const handlePaymentMethod = async (methodId: string) => {
     setShowPaymentOptions(false);
-    
+
     if (methodId === 'card') {
       setShowCardForm(true);
     } else if (methodId === 'upi') {
@@ -175,18 +183,23 @@ const CartScreen = () => {
 
   const processCardPayment = async () => {
     if (!validateCardDetails()) return;
-    
+
     const finalAmount = getFinalAmount();
     const maskedCard = cardDetails.number.replace(/.(?=.{4})/g, '*');
-    
+
     Alert.alert(
       'Payment Successful!',
       `Card payment completed!\nCard: ${maskedCard}\nAmount: ₹${finalAmount}\nTransaction ID: CARD${Date.now()}`,
-      [{text: 'OK', onPress: () => {
-        clearCart();
-        setShowCardForm(false);
-        setCardDetails({number: '', expiry: '', cvv: '', name: ''});
-      }}]
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            clearCart();
+            setShowCardForm(false);
+            setCardDetails({number: '', expiry: '', cvv: '', name: ''});
+          },
+        },
+      ],
     );
   };
 
@@ -213,7 +226,7 @@ const CartScreen = () => {
   const formatCardNumber = (text: string) => {
     const cleaned = text.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
     const matches = cleaned.match(/\d{4,16}/g);
-    const match = matches && matches[0] || '';
+    const match = (matches && matches[0]) || '';
     const parts = [];
     for (let i = 0, len = match.length; i < len; i += 4) {
       parts.push(match.substring(i, i + 4));
@@ -239,27 +252,29 @@ const CartScreen = () => {
     Alert.alert(
       'Payment Successful!',
       `${methodName} payment completed!\nAmount: ₹${finalAmount}\nTransaction ID: UPI${Date.now()}`,
-      [{text: 'OK', onPress: () => clearCart()}]
+      [{text: 'OK', onPress: () => clearCart()}],
     );
   };
 
   const processWalletPayment = async (method: string) => {
     const finalAmount = getFinalAmount();
-    const methodName = walletOptions.find(opt => opt.id === method)?.name || 'Wallet';
+    const methodName =
+      walletOptions.find(opt => opt.id === method)?.name || 'Wallet';
     Alert.alert(
       'Payment Successful!',
       `${methodName} payment completed!\nAmount: ₹${finalAmount}\nTransaction ID: WAL${Date.now()}`,
-      [{text: 'OK', onPress: () => clearCart()}]
+      [{text: 'OK', onPress: () => clearCart()}],
     );
   };
 
   const processBankPayment = async (method: string) => {
     const finalAmount = getFinalAmount();
-    const methodName = bankOptions.find(opt => opt.id === method)?.name || 'Net Banking';
+    const methodName =
+      bankOptions.find(opt => opt.id === method)?.name || 'Net Banking';
     Alert.alert(
       'Payment Successful!',
       `${methodName} payment completed!\nAmount: ₹${finalAmount}\nTransaction ID: NB${Date.now()}`,
-      [{text: 'OK', onPress: () => clearCart()}]
+      [{text: 'OK', onPress: () => clearCart()}],
     );
   };
 
@@ -268,7 +283,7 @@ const CartScreen = () => {
     Alert.alert(
       'Order Confirmed!',
       `Cash on Delivery order placed!\nAmount: ₹${finalAmount}\nOrder ID: COD${Date.now()}`,
-      [{text: 'OK', onPress: () => clearCart()}]
+      [{text: 'OK', onPress: () => clearCart()}],
     );
   };
 
@@ -386,6 +401,10 @@ const CartScreen = () => {
             <Text style={[styles.sectionTitle, {color: colors.text}]}>
               Apply Coupon
             </Text>
+            <Button
+              title="Chat"
+              onPress={() => navigation.navigate('ChatScreen' as never)}
+            />
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -653,35 +672,56 @@ const CartScreen = () => {
         animationType="slide"
         onRequestClose={() => setShowUPIOptions(false)}>
         <View style={styles.modalOverlay}>
-          <View style={[styles.paymentModal, {backgroundColor: colors.surface}]}>
-            <Text style={[styles.modalTitle, {color: colors.text}]}>Select UPI Method</Text>
+          <View
+            style={[styles.paymentModal, {backgroundColor: colors.surface}]}>
+            <Text style={[styles.modalTitle, {color: colors.text}]}>
+              Select UPI Method
+            </Text>
             {installedPaymentApps
-              .filter(app => ['Google Pay', 'PhonePe', 'Paytm', 'BHIM'].includes(app.name))
-              .map((app) => (
+              .filter(app =>
+                ['Google Pay', 'PhonePe', 'Paytm', 'BHIM'].includes(app.name),
+              )
+              .map(app => (
                 <TouchableOpacity
                   key={app.name}
-                  style={[styles.paymentOption, {borderColor: colors.text + '20', backgroundColor: '#e8f5e8'}]}
+                  style={[
+                    styles.paymentOption,
+                    {
+                      borderColor: colors.text + '20',
+                      backgroundColor: '#e8f5e8',
+                    },
+                  ]}
                   onPress={() => {
                     PaymentAppDetector.openPaymentApp(app.scheme);
                     handleUPIMethod(app.name.toLowerCase().replace(' ', ''));
                   }}>
                   <Text style={styles.paymentIcon}>✅</Text>
-                  <Text style={[styles.paymentName, {color: colors.text}]}>{app.name}</Text>
+                  <Text style={[styles.paymentName, {color: colors.text}]}>
+                    {app.name}
+                  </Text>
                 </TouchableOpacity>
               ))}
             <TouchableOpacity
               style={[styles.paymentOption, {borderColor: colors.text + '20'}]}
               onPress={() => handleUPIMethod('upi_id')}>
               <Text style={styles.paymentIcon}>📱</Text>
-              <Text style={[styles.paymentName, {color: colors.text}]}>Enter UPI ID</Text>
+              <Text style={[styles.paymentName, {color: colors.text}]}>
+                Enter UPI ID
+              </Text>
             </TouchableOpacity>
-            {installedPaymentApps.filter(app => ['Google Pay', 'PhonePe', 'Paytm', 'BHIM'].includes(app.name)).length === 0 && (
-              <Text style={[styles.noAppsText, {color: colors.text}]}>No UPI apps detected</Text>
+            {installedPaymentApps.filter(app =>
+              ['Google Pay', 'PhonePe', 'Paytm', 'BHIM'].includes(app.name),
+            ).length === 0 && (
+              <Text style={[styles.noAppsText, {color: colors.text}]}>
+                No UPI apps detected
+              </Text>
             )}
             <TouchableOpacity
               style={[styles.cancelButton, {borderColor: colors.primary}]}
               onPress={() => setShowUPIOptions(false)}>
-              <Text style={[styles.cancelText, {color: colors.primary}]}>Cancel</Text>
+              <Text style={[styles.cancelText, {color: colors.primary}]}>
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -694,29 +734,52 @@ const CartScreen = () => {
         animationType="slide"
         onRequestClose={() => setShowWalletOptions(false)}>
         <View style={styles.modalOverlay}>
-          <View style={[styles.paymentModal, {backgroundColor: colors.surface}]}>
-            <Text style={[styles.modalTitle, {color: colors.text}]}>Select Wallet</Text>
+          <View
+            style={[styles.paymentModal, {backgroundColor: colors.surface}]}>
+            <Text style={[styles.modalTitle, {color: colors.text}]}>
+              Select Wallet
+            </Text>
             {installedPaymentApps
-              .filter(app => ['Paytm', 'MobiKwik', 'FreeCharge', 'Amazon Pay'].includes(app.name))
-              .map((app) => (
+              .filter(app =>
+                ['Paytm', 'MobiKwik', 'FreeCharge', 'Amazon Pay'].includes(
+                  app.name,
+                ),
+              )
+              .map(app => (
                 <TouchableOpacity
                   key={app.name}
-                  style={[styles.paymentOption, {borderColor: colors.text + '20', backgroundColor: '#fff3e0'}]}
+                  style={[
+                    styles.paymentOption,
+                    {
+                      borderColor: colors.text + '20',
+                      backgroundColor: '#fff3e0',
+                    },
+                  ]}
                   onPress={() => {
                     PaymentAppDetector.openPaymentApp(app.scheme);
                     handleWalletMethod(app.name.toLowerCase().replace(' ', ''));
                   }}>
                   <Text style={styles.paymentIcon}>✅</Text>
-                  <Text style={[styles.paymentName, {color: colors.text}]}>{app.name}</Text>
+                  <Text style={[styles.paymentName, {color: colors.text}]}>
+                    {app.name}
+                  </Text>
                 </TouchableOpacity>
               ))}
-            {installedPaymentApps.filter(app => ['Paytm', 'MobiKwik', 'FreeCharge', 'Amazon Pay'].includes(app.name)).length === 0 && (
-              <Text style={[styles.noAppsText, {color: colors.text}]}>No wallet apps detected</Text>
+            {installedPaymentApps.filter(app =>
+              ['Paytm', 'MobiKwik', 'FreeCharge', 'Amazon Pay'].includes(
+                app.name,
+              ),
+            ).length === 0 && (
+              <Text style={[styles.noAppsText, {color: colors.text}]}>
+                No wallet apps detected
+              </Text>
             )}
             <TouchableOpacity
               style={[styles.cancelButton, {borderColor: colors.primary}]}
               onPress={() => setShowWalletOptions(false)}>
-              <Text style={[styles.cancelText, {color: colors.primary}]}>Cancel</Text>
+              <Text style={[styles.cancelText, {color: colors.primary}]}>
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -729,32 +792,54 @@ const CartScreen = () => {
         animationType="slide"
         onRequestClose={() => setShowBankOptions(false)}>
         <View style={styles.modalOverlay}>
-          <View style={[styles.paymentModal, {backgroundColor: colors.surface}]}>
-            <Text style={[styles.modalTitle, {color: colors.text}]}>Select Bank</Text>
+          <View
+            style={[styles.paymentModal, {backgroundColor: colors.surface}]}>
+            <Text style={[styles.modalTitle, {color: colors.text}]}>
+              Select Bank
+            </Text>
             {installedPaymentApps
-              .filter(app => ['SBI Pay', 'HDFC PayZapp', 'ICICI Pockets', 'Axis Pay'].includes(app.name))
-              .map((app) => (
+              .filter(app =>
+                [
+                  'SBI Pay',
+                  'HDFC PayZapp',
+                  'ICICI Pockets',
+                  'Axis Pay',
+                ].includes(app.name),
+              )
+              .map(app => (
                 <TouchableOpacity
                   key={app.name}
-                  style={[styles.paymentOption, {borderColor: colors.text + '20', backgroundColor: '#e3f2fd'}]}
+                  style={[
+                    styles.paymentOption,
+                    {
+                      borderColor: colors.text + '20',
+                      backgroundColor: '#e3f2fd',
+                    },
+                  ]}
                   onPress={() => {
                     PaymentAppDetector.openPaymentApp(app.scheme);
                     handleBankMethod(app.name.toLowerCase().replace(' ', ''));
                   }}>
                   <Text style={styles.paymentIcon}>✅</Text>
-                  <Text style={[styles.paymentName, {color: colors.text}]}>{app.name}</Text>
+                  <Text style={[styles.paymentName, {color: colors.text}]}>
+                    {app.name}
+                  </Text>
                 </TouchableOpacity>
               ))}
             <TouchableOpacity
               style={[styles.paymentOption, {borderColor: colors.text + '20'}]}
               onPress={() => handleBankMethod('netbanking')}>
               <Text style={styles.paymentIcon}>🏦</Text>
-              <Text style={[styles.paymentName, {color: colors.text}]}>Other Net Banking</Text>
+              <Text style={[styles.paymentName, {color: colors.text}]}>
+                Other Net Banking
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.cancelButton, {borderColor: colors.primary}]}
               onPress={() => setShowBankOptions(false)}>
-              <Text style={[styles.cancelText, {color: colors.primary}]}>Cancel</Text>
+              <Text style={[styles.cancelText, {color: colors.primary}]}>
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -768,59 +853,83 @@ const CartScreen = () => {
         onRequestClose={() => setShowCardForm(false)}>
         <View style={styles.modalOverlay}>
           <View style={[styles.cardModal, {backgroundColor: colors.surface}]}>
-            <Text style={[styles.modalTitle, {color: colors.text}]}>Enter Card Details</Text>
-            
+            <Text style={[styles.modalTitle, {color: colors.text}]}>
+              Enter Card Details
+            </Text>
+
             <TextInput
-              style={[styles.cardInput, {borderColor: colors.primary, color: colors.text}]}
+              style={[
+                styles.cardInput,
+                {borderColor: colors.primary, color: colors.text},
+              ]}
               placeholder="Card Number"
               placeholderTextColor={colors.text + '60'}
               value={cardDetails.number}
-              onChangeText={(text) => setCardDetails({...cardDetails, number: formatCardNumber(text)})}
+              onChangeText={text =>
+                setCardDetails({...cardDetails, number: formatCardNumber(text)})
+              }
               keyboardType="numeric"
               maxLength={19}
             />
-            
+
             <View style={styles.cardRow}>
               <TextInput
-                style={[styles.cardInputHalf, {borderColor: colors.primary, color: colors.text}]}
+                style={[
+                  styles.cardInputHalf,
+                  {borderColor: colors.primary, color: colors.text},
+                ]}
                 placeholder="MM/YY"
                 placeholderTextColor={colors.text + '60'}
                 value={cardDetails.expiry}
-                onChangeText={(text) => setCardDetails({...cardDetails, expiry: formatExpiry(text)})}
+                onChangeText={text =>
+                  setCardDetails({...cardDetails, expiry: formatExpiry(text)})
+                }
                 keyboardType="numeric"
                 maxLength={5}
               />
               <TextInput
-                style={[styles.cardInputHalf, {borderColor: colors.primary, color: colors.text}]}
+                style={[
+                  styles.cardInputHalf,
+                  {borderColor: colors.primary, color: colors.text},
+                ]}
                 placeholder="CVV"
                 placeholderTextColor={colors.text + '60'}
                 value={cardDetails.cvv}
-                onChangeText={(text) => setCardDetails({...cardDetails, cvv: text.replace(/\D/g, '')})}
+                onChangeText={text =>
+                  setCardDetails({...cardDetails, cvv: text.replace(/\D/g, '')})
+                }
                 keyboardType="numeric"
                 maxLength={4}
                 secureTextEntry
               />
             </View>
-            
+
             <TextInput
-              style={[styles.cardInput, {borderColor: colors.primary, color: colors.text}]}
+              style={[
+                styles.cardInput,
+                {borderColor: colors.primary, color: colors.text},
+              ]}
               placeholder="Cardholder Name"
               placeholderTextColor={colors.text + '60'}
               value={cardDetails.name}
-              onChangeText={(text) => setCardDetails({...cardDetails, name: text.toUpperCase()})}
+              onChangeText={text =>
+                setCardDetails({...cardDetails, name: text.toUpperCase()})
+              }
               autoCapitalize="characters"
             />
-            
+
             <TouchableOpacity
               style={[styles.payButton, {backgroundColor: colors.primary}]}
               onPress={processCardPayment}>
               <Text style={styles.payButtonText}>Pay ₹{getFinalAmount()}</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={[styles.cancelButton, {borderColor: colors.primary}]}
               onPress={() => setShowCardForm(false)}>
-              <Text style={[styles.cancelText, {color: colors.primary}]}>Cancel</Text>
+              <Text style={[styles.cancelText, {color: colors.primary}]}>
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

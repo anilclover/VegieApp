@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {requestAllPermissions} from '../utils/PermissionManager';
+import BiometricButton from '../components/BiometricButton';
 const {height} = Dimensions.get('window');
 
 const logos = [
@@ -79,6 +80,10 @@ const LoginScreen = () => {
           contentContainerStyle={{flexGrow: 1, justifyContent: 'flex-end'}}
           keyboardShouldPersistTaps="handled">
           <View style={styles.overlay}>
+            <View style={styles.logoContainer}>
+              <Text style={styles.logo}>🥬</Text>
+              <Text style={styles.appName}>VegEase</Text>
+            </View>
             <Text style={styles.title}>Luxury You Aspire</Text>
 
             <View style={styles.inputWrapper}>
@@ -92,9 +97,22 @@ const LoginScreen = () => {
 
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate('Main' as never)}>
+              onPress={() => {
+                console.log('📱 Regular login button pressed');
+                navigation.navigate('Main' as never);
+              }}>
               <Text style={styles.buttonText}>Continue</Text>
             </TouchableOpacity>
+
+            <BiometricButton
+              title="🔐 Use Biometric"
+              onSuccess={() => {
+                console.log('✅ Biometric login successful from LoginScreen');
+                navigation.navigate('Main' as never);
+              }}
+              onError={(error) => console.log('❌ Biometric login failed:', error)}
+              style={styles.biometricButton}
+            />
 
             <Text style={styles.terms}>
               By continuing you agree to our{' '}
@@ -135,6 +153,20 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  logo: {
+    fontSize: 40,
+    marginBottom: 5,
+  },
+  appName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#28a745',
+    letterSpacing: 1,
+  },
   title: {
     fontSize: 18,
     fontWeight: '600',
@@ -160,6 +192,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonText: {color: '#fff', fontWeight: '600', textAlign: 'center'},
+  biometricButton: {
+    backgroundColor: '#28a745',
+    marginBottom: 20,
+  },
   terms: {fontSize: 12, textAlign: 'center', color: '#333', marginBottom: 12},
   support: {fontSize: 13, textAlign: 'center', color: '#333'},
   link: {color: '#4a90e2', fontWeight: '600'},

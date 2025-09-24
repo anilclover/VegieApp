@@ -15,9 +15,7 @@ const AppContent = () => {
         backgroundColor={colors.statusBar}
         barStyle={isDark ? 'light-content' : 'dark-content'}
       />
-      <NavigationContainer>
-        <AppNavigator />
-      </NavigationContainer>
+      <AppNavigator />
     </SafeAreaProvider>
   );
 };
@@ -31,7 +29,5 @@ function App(): React.JSX.Element {
     </ThemeProvider>
   );
 }
-
-
 
 export default App;

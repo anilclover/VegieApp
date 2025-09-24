@@ -313,3 +313,110 @@ export const flashDeals = [
     unit: '250 GM',
   },
 ];
+
+export const userData = [
+  {
+    id: 'U1',
+    name: 'John Doe',
+    message: 'Hey, how are you?',
+    time: '10:30 AM',
+    avatar: 'https://i.pravatar.cc/150?img=1',
+  },
+  {
+    id: 'U2',
+    name: 'Jane Smith',
+    message: 'Let’s catch up tomorrow!',
+    time: '09:15 AM',
+    avatar: 'https://i.pravatar.cc/150?img=2',
+  },
+  {
+    id: 'U3',
+    name: 'Alex Wilson',
+    message: 'Typing...',
+    time: 'Yesterday',
+    avatar: 'https://i.pravatar.cc/150?img=3',
+  },
+  {
+    id: 'U4',
+    name: 'Paresh',
+    message: 'Typing...',
+    time: 'Yesterday',
+    avatar: 'https://i.pravatar.cc/150?img=3',
+  },
+  {
+    id: 'U5',
+    name: 'John Doe',
+    message: 'Hey, how are you?',
+    time: '10:30 AM',
+    avatar: 'https://i.pravatar.cc/150?img=1',
+  },
+  {
+    id: 'U6',
+    name: 'Jane Smith',
+    message: 'Let’s catch up tomorrow!',
+    time: '09:15 AM',
+    avatar: 'https://i.pravatar.cc/150?img=2',
+  },
+  {
+    id: 'U7',
+    name: 'Alex Wilson',
+    message: 'Typing...',
+    time: 'Yesterday',
+    avatar: 'https://i.pravatar.cc/150?img=3',
+  },
+  {
+    id: 'U8',
+    name: 'Paresh',
+    message: 'Typing...',
+    time: 'Yesterday',
+    avatar: 'https://i.pravatar.cc/150?img=3',
+  },
+  {
+    id: 'U9',
+    name: 'Paresh Chaudhary',
+    message: 'Typing...',
+    time: 'Yesterday',
+    avatar: '',
+  },
+  {
+    id: 'U10',
+    name: 'Paresh',
+    message: 'Typing...',
+    time: 'Yesterday',
+    avatar: 'https://i.pravatar.cc/150?img=3',
+  },
+  {
+    id: 'U11',
+    name: 'Paresh',
+    message: 'Typing...',
+    time: 'Yesterday',
+    avatar: 'https://i.pravatar.cc/150?img=3',
+  },
+  {
+    id: 'U12',
+    name: 'Paresh',
+    message: 'Typing...',
+    time: 'Yesterday',
+    avatar: 'https://i.pravatar.cc/150?img=3',
+  },
+];
+
+export const menuOptionsDashBoard = [
+  'New group',
+  'New Community',
+  'New broadcast',
+  'Link devices',
+  'Starred',
+  'Payment',
+  'Read all',
+  'Settings',
+];
+export const menuOptions = [
+  'Add Contact',
+  'Search',
+  'Report',
+  'E-lock',
+  'Mute Notifications',
+  'More >',
+];
+// ── ⋆⋅☆⋅⋆ ──

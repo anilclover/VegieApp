@@ -403,7 +403,7 @@ const CartScreen = () => {
             </Text>
             <Button
               title="Chat"
-              onPress={() => navigation.navigate('ChatScreen' as never)}
+              onPress={() => navigation.navigate('AllChats' as never)}
             />
             <ScrollView
               horizontal

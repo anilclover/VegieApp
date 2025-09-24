@@ -15,6 +15,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {requestAllPermissions} from '../utils/PermissionManager';
 import BiometricButton from '../components/BiometricButton';
+import ResponsiveUI from '../utils/Responsive';
 const {height} = Dimensions.get('window');
 
 const logos = [
@@ -36,7 +37,6 @@ const LoginScreen = () => {
       {iterations: -1},
     ).start();
   }, [scrollY]);
-
 
   return (
     <KeyboardAvoidingView
@@ -110,7 +110,9 @@ const LoginScreen = () => {
                 console.log('✅ Biometric login successful from LoginScreen');
                 navigation.navigate('Main' as never);
               }}
-              onError={(error) => console.log('❌ Biometric login failed:', error)}
+              onError={error =>
+                console.log('❌ Biometric login failed:', error)
+              }
               style={styles.biometricButton}
             />
 
@@ -168,7 +170,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   title: {
-    fontSize: 18,
+    fontSize: ResponsiveUI.textFontSize(18),
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 20,
@@ -179,24 +181,37 @@ const styles = StyleSheet.create({
     borderWidth: 1.2,
     borderColor: '#ccc',
     borderRadius: 8,
-    marginBottom: 20,
-    paddingHorizontal: 10,
+    marginBottom: ResponsiveUI.margin.bottom(20),
+    paddingHorizontal: ResponsiveUI.padding.horizontal(10),
     backgroundColor: '#fff',
   },
-  prefix: {fontSize: 16, marginRight: 6, color: '#444'},
-  input: {flex: 1, fontSize: 16, paddingVertical: 12},
+  prefix: {
+    fontSize: 16,
+    marginRight: ResponsiveUI.margin.right(6),
+    color: '#444',
+  },
+  input: {
+    flex: 1,
+    fontSize: ResponsiveUI.textFontSize(16),
+    paddingVertical: ResponsiveUI.padding.vertical(12),
+  },
   button: {
     backgroundColor: '#4a90e2',
-    paddingVertical: 14,
+    paddingVertical: ResponsiveUI.padding.vertical(12),
     borderRadius: 8,
-    marginBottom: 20,
+    marginBottom: ResponsiveUI.margin.bottom(20),
   },
   buttonText: {color: '#fff', fontWeight: '600', textAlign: 'center'},
   biometricButton: {
     backgroundColor: '#28a745',
     marginBottom: 20,
   },
-  terms: {fontSize: 12, textAlign: 'center', color: '#333', marginBottom: 12},
+  terms: {
+    fontSize: 12,
+    textAlign: 'center',
+    color: '#333',
+    marginBottom: ResponsiveUI.margin.bottom(12),
+  },
   support: {fontSize: 13, textAlign: 'center', color: '#333'},
   link: {color: '#4a90e2', fontWeight: '600'},
 });

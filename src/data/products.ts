@@ -321,6 +321,7 @@ export const userData = [
     message: 'Hey, how are you?',
     time: '10:30 AM',
     avatar: 'https://i.pravatar.cc/150?img=1',
+    phone: '+919876543211',
   },
   {
     id: 'U2',
@@ -328,6 +329,7 @@ export const userData = [
     message: 'Let’s catch up tomorrow!',
     time: '09:15 AM',
     avatar: 'https://i.pravatar.cc/150?img=2',
+    phone: '+919876543212',
   },
   {
     id: 'U3',
@@ -335,6 +337,7 @@ export const userData = [
     message: 'Typing...',
     time: 'Yesterday',
     avatar: 'https://i.pravatar.cc/150?img=3',
+    phone: '+919876543213',
   },
   {
     id: 'U4',
@@ -342,6 +345,7 @@ export const userData = [
     message: 'Typing...',
     time: 'Yesterday',
     avatar: 'https://i.pravatar.cc/150?img=3',
+    phone: '+919876543214',
   },
   {
     id: 'U5',
@@ -349,6 +353,7 @@ export const userData = [
     message: 'Hey, how are you?',
     time: '10:30 AM',
     avatar: 'https://i.pravatar.cc/150?img=1',
+    phone: '+919876543215',
   },
   {
     id: 'U6',
@@ -356,6 +361,7 @@ export const userData = [
     message: 'Let’s catch up tomorrow!',
     time: '09:15 AM',
     avatar: 'https://i.pravatar.cc/150?img=2',
+    phone: '+919876543216',
   },
   {
     id: 'U7',
@@ -363,6 +369,7 @@ export const userData = [
     message: 'Typing...',
     time: 'Yesterday',
     avatar: 'https://i.pravatar.cc/150?img=3',
+    phone: '+919876543217',
   },
   {
     id: 'U8',
@@ -370,6 +377,7 @@ export const userData = [
     message: 'Typing...',
     time: 'Yesterday',
     avatar: 'https://i.pravatar.cc/150?img=3',
+    phone: '+919876543218',
   },
   {
     id: 'U9',
@@ -377,6 +385,7 @@ export const userData = [
     message: 'Typing...',
     time: 'Yesterday',
     avatar: '',
+    phone: '+919876543219',
   },
   {
     id: 'U10',
@@ -384,6 +393,7 @@ export const userData = [
     message: 'Typing...',
     time: 'Yesterday',
     avatar: 'https://i.pravatar.cc/150?img=3',
+    phone: '+919876543210',
   },
   {
     id: 'U11',
@@ -391,6 +401,7 @@ export const userData = [
     message: 'Typing...',
     time: 'Yesterday',
     avatar: 'https://i.pravatar.cc/150?img=3',
+    phone: '+919876543223',
   },
   {
     id: 'U12',
@@ -398,6 +409,7 @@ export const userData = [
     message: 'Typing...',
     time: 'Yesterday',
     avatar: 'https://i.pravatar.cc/150?img=3',
+    phone: '+919876543222',
   },
 ];
 
@@ -419,4 +431,115 @@ export const menuOptions = [
   'Mute Notifications',
   'More >',
 ];
+
+export type CallItem = {
+  id: string;
+  name: string;
+  avatar?: string | null;
+  phone: string;
+};
 // ── ⋆⋅☆⋅⋆ ──
+
+export type Call = {
+  id: string;
+  name: string;
+  avatar?: string | null;
+  type: 'voice' | 'video';
+  status: 'incoming' | 'outgoing' | 'missed';
+  time: string;
+  phone: string;
+};
+
+export const favorites: Call[] = [
+  {
+    id: 'f1',
+    name: 'Bestie',
+    avatar: 'https://i.pravatar.cc/150?img=11',
+    type: 'voice',
+    status: 'incoming',
+    time: 'Yesterday',
+    phone: '+919876543211',
+  },
+  {
+    id: 'f2',
+    name: 'Siblings Only!',
+    avatar: 'https://i.pravatar.cc/150?img=12',
+    type: 'voice',
+    status: 'outgoing',
+    time: 'Today',
+    phone: '+919876543212',
+  },
+  {
+    id: 'f3',
+    name: 'Momma',
+    avatar: 'https://i.pravatar.cc/150?img=13',
+    type: 'voice',
+    status: 'missed',
+    time: '20 Sept',
+    phone: '+919876543212',
+  },
+  {
+    id: 'f4',
+    name: 'Paresh Chaudhary',
+    avatar: '',
+    type: 'voice',
+    status: 'missed',
+    time: '21 Sept',
+    phone: '+919876543216',
+  },
+];
+
+export const recents: Call[] = [
+  {
+    id: 'r1',
+    name: 'Yasmin Palermo',
+    avatar: 'https://i.pravatar.cc/150?img=14',
+    type: 'voice',
+    status: 'incoming',
+    time: 'Today, 11:39 AM',
+    phone: '+919876543211',
+  },
+  {
+    id: 'r2',
+    name: 'John Doe',
+    avatar: 'https://i.pravatar.cc/150?img=15',
+    type: 'video',
+    status: 'outgoing',
+    time: 'Yesterday, 9:15 PM',
+    phone: '+919876543215',
+  },
+  {
+    id: 'r3',
+    name: 'Jane Smith',
+    avatar: 'https://i.pravatar.cc/150?img=16',
+    type: 'voice',
+    status: 'missed',
+    time: '21 Sept',
+    phone: '+919876543216',
+  },
+  {
+    id: 'r4',
+    name: 'Paresh Chaudhary',
+    avatar: '',
+    type: 'voice',
+    status: 'missed',
+    time: '21 Sept',
+    phone: '+919876543216',
+  },
+];
+
+
+export type Phone = {
+  type: string;
+  number: string;
+};
+
+export type Contact = {
+  id: string;
+  name: string;
+  phones: Phone[];
+  emails: string[];
+  addresses: string[];
+  photo: string | null;
+  note: string | null;
+};

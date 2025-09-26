@@ -41,8 +41,7 @@ const AllFriends = () => {
         style={styles.chatItem}
         onPress={() => {
           navigation.navigate('ChatScreen', {
-            name: item.name,
-            avatar: item.avatar,
+            item,
           });
         }}>
         {hasAvatar ? (

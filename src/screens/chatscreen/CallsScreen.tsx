@@ -1,4 +1,3 @@
-// CallScreen.tsx
 import React from 'react';
 import {
   View,
@@ -8,52 +7,14 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import ResponsiveUI from '../../utils/Responsive';
-import {useNavigation} from '@react-navigation/native';
 import {navigate} from '../../utils/NavigationUtils';
-
-type Call = {
-  id: string;
-  name: string;
-  avatar?: string | null;
-  type: 'voice' | 'video';
-  status: 'incoming' | 'outgoing' | 'missed';
-  time: string;
-};
-
-const calls: Call[] = [
-  {
-    id: '1',
-    name: 'John Doe',
-    avatar: null,
-    type: 'voice',
-    status: 'incoming',
-    time: '10:45 AM',
-  },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    avatar: null,
-    type: 'video',
-    status: 'outgoing',
-    time: 'Yesterday',
-  },
-  {
-    id: '3',
-    name: 'Alice Brown',
-    avatar: null,
-    type: 'voice',
-    status: 'missed',
-    time: '20 September',
-  },
-];
+import {Call, recents, favorites} from '../../data/products';
 
 const CallsScreen = () => {
   const renderAvatar = (item: Call) => {
     if (item.avatar) {
       return <Image source={{uri: item.avatar}} style={styles.avatar} />;
     }
-    // Show initials if no avatar
     const initials = item.name
       .split(' ')
       .map(word => word.charAt(0).toUpperCase())
@@ -79,7 +40,7 @@ const CallsScreen = () => {
     }
   };
 
-  const renderTypeIcon = (type: Call['type']) => {
+  const renderActionIcon = (type: Call['type']) => {
     return type === 'voice' ? (
       <Text style={styles.callIcon}>📞</Text>
     ) : (
@@ -87,10 +48,10 @@ const CallsScreen = () => {
     );
   };
 
-  const renderItem = ({item}: {item: Call}) => (
+  const renderCallItem = ({item}: {item: Call}) => (
     <TouchableOpacity
       style={styles.callItem}
-      onPress={() => navigate('CallDetailsScreen')}>
+      onPress={() => navigate('CallDetailsScreen', {item})}>
       {renderAvatar(item)}
       <View style={styles.callDetails}>
         <Text
@@ -102,43 +63,97 @@ const CallsScreen = () => {
         </Text>
         <View style={styles.callInfo}>
           {renderStatusIcon(item.status)}
-          <Text style={[styles.callTime]}>{item.time}</Text>
+          <Text style={styles.callTime}>{item.time}</Text>
         </View>
       </View>
-      {renderTypeIcon(item.type)}
+      {renderActionIcon(item.type)}
     </TouchableOpacity>
   );
 
+  const renderHeader = () => (
+    <>
+      {/* Header */}
+      <View style={styles.headerRow}>
+        <Text style={styles.headerTitle}>Calls</Text>
+        <View style={styles.headerIcons}>
+          <Text style={styles.icon}>📷</Text>
+          <Text style={[styles.icon, {marginLeft: 20}]}>⋮</Text>
+        </View>
+      </View>
+
+      {/* Favorites */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Favorites</Text>
+          <TouchableOpacity>
+            <Text style={styles.moreBtn}>More</Text>
+          </TouchableOpacity>
+        </View>
+        {favorites.map(item => (
+          <TouchableOpacity
+            key={item.id}
+            onPress={() => navigate('CallDetailsScreen', {item})}>
+            <View style={styles.callItem}>
+              {renderAvatar(item)}
+              <Text style={styles.callName}>{item.name}</Text>
+              <View style={{flexDirection: 'row', marginLeft: 'auto'}}>
+                <Text style={styles.callIcon}>📞</Text>
+                <Text style={[styles.callIcon, {marginLeft: 20}]}>🎥</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Recent header */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Recent</Text>
+      </View>
+    </>
+  );
+
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={calls}
-        keyExtractor={item => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={{paddingVertical: 10}}
-      />
-    </View>
+    <FlatList
+      style={styles.container}
+      data={recents}
+      keyExtractor={item => item.id}
+      renderItem={renderCallItem}
+      ListHeaderComponent={renderHeader}
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
+  container: {flex: 1, backgroundColor: '#fff'},
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 15,
+    alignItems: 'center',
   },
+  headerTitle: {fontSize: 22, fontWeight: 'bold', color: '#000'},
+  headerIcons: {flexDirection: 'row'},
+  icon: {fontSize: 22, color: '#000'},
+
+  section: {marginTop: 10},
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+  },
+  sectionTitle: {fontSize: 16, fontWeight: '600', color: '#000'},
+  moreBtn: {fontSize: 14, color: '#128C7E', fontWeight: '500'},
+
   callItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: ResponsiveUI.padding.vertical(12),
-    paddingHorizontal: ResponsiveUI.padding.horizontal(15),
+    paddingVertical: 12,
+    paddingHorizontal: 15,
     borderBottomWidth: 0.5,
     borderBottomColor: '#ddd',
   },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-  },
+  avatar: {width: 48, height: 48, borderRadius: 24},
   avatarPlaceholder: {
     width: 48,
     height: 48,
@@ -147,38 +162,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  avatarText: {
-    fontSize: 18,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  callDetails: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  callName: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
-  },
-  callInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 3,
-  },
-  statusIcon: {
-    fontSize: 24,
-    marginRight: 5,
-    fontWeight: 'bold',
-  },
-  callTime: {
-    fontSize: 13,
-    color: '#555',
-  },
-  callIcon: {
-    fontSize: 20,
-    color: '#25D366', // WhatsApp green
-  },
+  avatarText: {fontSize: 18, color: '#fff', fontWeight: 'bold'},
+  callDetails: {flex: 1, marginLeft: 12},
+  callName: {fontSize: 16, fontWeight: '500', color: '#000',marginStart:10},
+  callInfo: {flexDirection: 'row', alignItems: 'center', marginTop: 3},
+  statusIcon: {fontSize: 18, marginRight: 5, fontWeight: 'bold'},
+  callTime: {fontSize: 13, color: '#555'},
+  callIcon: {fontSize: 20, color: '#25D366'},
 });
 
 export default CallsScreen;

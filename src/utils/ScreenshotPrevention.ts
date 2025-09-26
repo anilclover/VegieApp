@@ -1,6 +1,7 @@
-import { NativeModules } from 'react-native';
+import {NativeModules} from 'react-native';
 
-const { ScreenshotModule } = NativeModules;
+// import {requestContactsPermission} from './permissions';
+const {ScreenshotModule, ContactsModule} = NativeModules;
 
 export const preventScreenshot = () => {
   try {
@@ -21,3 +22,34 @@ export const allowScreenshot = () => {
     console.log('Screenshot allowance not available');
   }
 };
+
+// Read All contact from Device
+
+export async function loadContacts() {
+  const granted = await requestContactsPermission();
+  if (!granted) return;
+
+  const contacts = await ContactsModule.getContacts();
+  console.log('Device Contacts (JSON):', JSON.stringify(contacts, null, 2));
+  // console.log('Device Contacts:', contacts);
+  return contacts;
+}
+
+import {PermissionsAndroid} from 'react-native';
+
+export async function requestContactsPermission() {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+      {
+        title: 'Contacts Permission',
+        message: 'This app needs access to your contacts',
+        buttonPositive: 'Allow',
+      },
+    );
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  } catch (err) {
+    console.warn(err);
+    return false;
+  }
+}

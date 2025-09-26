@@ -15,7 +15,7 @@ import {
 import io from 'socket.io-client';
 import {useRoute, useNavigation} from '@react-navigation/native';
 import ResponsiveUI from '../../utils/Responsive';
-import {menuOptions} from '../../data/products';
+import {CallItem, menuOptions} from '../../data/products';
 import CustomMenuModal from '../../components/CustomMenuModal';
 
 const socket = io('http://your-server-url:3000'); // Replace with your server address
@@ -29,8 +29,9 @@ type Message = {
 
 const ChatScreen = () => {
   const route = useRoute();
+  const {item} = route.params as {item: CallItem};
   const navigation = useNavigation();
-  const {name, avatar}: any = route.params || {};
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
 
@@ -107,8 +108,10 @@ const ChatScreen = () => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
-          <Image source={{uri: avatar}} style={styles.avatar} />
-          <Text style={styles.name}>{name}</Text>
+          {/* <Image source={{uri: item.avatar}} style={styles.avatar} /> */}
+          <Image source={{uri: item.avatar as string}} style={styles.avatar} />
+
+          <Text style={styles.name}>{item.name}</Text>
         </View>
         {/* Right: call, video call, more */}
         <View style={styles.rightHeader}>

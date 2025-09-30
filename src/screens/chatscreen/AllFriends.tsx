@@ -85,6 +85,9 @@ const AllFriends = () => {
     <View style={[styles.container, {backgroundColor: colors.background}]}>
       {/* Header */}
       <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.backArrow}>←</Text>
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>WhatsApp</Text>
         <View style={styles.headerIcons}>
           <Text style={styles.icon}>🔍︎</Text>
@@ -139,6 +142,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 8,
   },
+  backArrow: {color: '#fff', fontSize: 20, fontWeight: 'bold'},
   headerTitle: {color: '#fff', fontSize: 20, fontWeight: 'bold'},
   headerIcons: {flexDirection: 'row'},
   icon: {color: '#fff', fontSize: 18, marginLeft: 20},
@@ -147,9 +151,9 @@ const styles = StyleSheet.create({
   chatItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     paddingVertical: 12,
-    borderBottomWidth: 0.5,
+    // borderBottomWidth: 0.2,
     borderBottomColor: '#ddd',
   },
   avatar: {width: 60, height: 60, borderRadius: 50, marginRight: 12},

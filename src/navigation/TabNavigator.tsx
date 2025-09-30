@@ -1,19 +1,19 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useTheme} from '../context/ThemeContext';
-
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import VegEaseScreen from '../screens/VegEaseScreen';
 import CategoriesScreen from '../screens/CategoriesScreen';
 import FlashDealScreen from '../screens/FlashDealScreen';
 import WalletScreen from '../screens/WalletScreen';
-import CartScreen from '../screens/CartScreen';
-import OrdersScreen from '../screens/OrdersScreen';
+import CartScreen from '../screens/CartScreen'; 
 import {useCart} from '../context/CartContext';
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
+  const insets = useSafeAreaInsets();
   const {colors} = useTheme();
   const {
     cart,
@@ -28,9 +28,22 @@ const TabNavigator = () => {
       screenOptions={({route}) => ({
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
+        // tabBarStyle: {
+        //   backgroundColor: colors.surface,
+        //   display: route.name === 'Search' ? 'none' : 'flex',
+        // },
+
         tabBarStyle: {
-          backgroundColor: colors.surface,
-          display: route.name === 'Search' ? 'none' : 'flex',
+          backgroundColor: '#fff',
+          borderTopWidth: 0.5,
+          borderTopColor: '#ccc',
+          paddingBottom:
+            Platform.OS === 'android'
+              ? Math.max(insets.bottom, 10)
+              : insets.bottom + 4,
+          paddingHorizontal: 4,
+          height:
+            Platform.OS === 'android' ? 60 + insets.bottom : 50 + insets.bottom,
         },
       })}>
       <Tab.Screen

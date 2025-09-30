@@ -3,9 +3,7 @@ import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import {useRoute} from '@react-navigation/native';
 import {goBack, navigate} from '../../utils/NavigationUtils';
-import { CallItem } from '../../data/products';
-
-
+import {CallItem} from '../../data/products';
 
 const CallDetailsScreen = () => {
   const route = useRoute();
@@ -87,7 +85,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   backBtnWrap: {width: 40, alignItems: 'flex-start'},
-  backBtn: {fontSize: 22, color: '#128C7E'},
+  backBtn: {fontSize: 22, color: '#128C7E', marginRight: 20},
+
   headerTitle: {fontSize: 18, fontWeight: 'bold', color: '#000'},
   headerRight: {width: 40},
 

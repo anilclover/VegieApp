@@ -1,8 +1,8 @@
-// // BottomTabs.tsx
 // BottomTabs.tsx
 import React from 'react';
-import {View, Text} from 'react-native';
+import {View, Text, Platform} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import ChatScreen from '../screens/chatscreen/ChatScreen';
 import StatusScreen from '../screens/chatscreen/StatusScreen';
 import CommunitiesScreen from '../screens/chatscreen/CommunitiesScreen';
@@ -13,6 +13,8 @@ import ContactsScreen from '../screens/chatscreen/ContactsScreen.tsx';
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabs() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
@@ -20,16 +22,21 @@ export default function BottomTabs() {
         tabBarActiveTintColor: '#25D366',
         tabBarInactiveTintColor: 'gray',
         tabBarLabelStyle: {
-          fontSize: 14,
-          fontWeight: '600',
-          marginBottom: 4, // add little spacing so text sits above the edge
+          fontSize: 12,
+          fontWeight: 'bold',
+          marginBottom: Platform.OS === 'android' ? 8 : 4,
         },
         tabBarStyle: {
           backgroundColor: '#fff',
           borderTopWidth: 0.5,
           borderTopColor: '#ccc',
-          paddingBottom: 4, // give extra padding for bottom safe area
-          height: 60, // slightly taller bar for spacing
+          paddingBottom:
+            Platform.OS === 'android'
+              ? Math.max(insets.bottom, 10)
+              : insets.bottom + 4,
+          paddingHorizontal: 4,
+          height:
+            Platform.OS === 'android' ? 60 + insets.bottom : 50 + insets.bottom,
         },
         // 👇 Add icon logic here
         tabBarIcon: ({color, size, focused}) => {
@@ -41,6 +48,8 @@ export default function BottomTabs() {
           } else if (route.name === 'Communities') {
             iconName = '👥';
           } else if (route.name === 'Calls') {
+            iconName = '📞';
+          } else if (route.name === 'Contact') {
             iconName = '📞';
           }
 

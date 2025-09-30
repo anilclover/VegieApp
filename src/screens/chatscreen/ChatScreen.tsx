@@ -10,7 +10,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  Modal,
 } from 'react-native';
 import io from 'socket.io-client';
 import {useRoute, useNavigation} from '@react-navigation/native';
@@ -130,31 +129,6 @@ const ChatScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-      {/* 
-      <Modal
-        visible={menuVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setMenuVisible(false)}>
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPressOut={() => setMenuVisible(false)}>
-          <View style={styles.menuContainer}>
-            {menuOptions.map((option, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.menuItem}
-                onPress={() => {
-                  console.log(option); // handle action
-                  setMenuVisible(false);
-                }}>
-                <Text style={styles.menuText}>{option}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </TouchableOpacity>
-      </Modal> */}
 
       <CustomMenuModal
         visible={menuVisible}
@@ -174,6 +148,7 @@ const ChatScreen = () => {
 
       {/* Input */}
       {/* Input + Icons */}
+
       <View style={styles.inputWrapperContainer}>
         <View style={styles.inputWrapper}>
           <TextInput
@@ -202,6 +177,8 @@ const ChatScreen = () => {
     </KeyboardAvoidingView>
   );
 };
+
+export default ChatScreen;
 
 const styles = StyleSheet.create({
   container: {flex: 1, backgroundColor: '#ECE5DD'},
@@ -338,7 +315,7 @@ const styles = StyleSheet.create({
   },
   avatar: {width: 42, height: 42, borderRadius: 100, marginRight: 12},
   name: {color: '#fff', fontSize: 18, fontWeight: 'bold', marginLeft: 10},
-  backArrow: {color: '#fff', fontSize: 20, fontWeight: 'bold'},
+  backArrow: {color: '#fff', fontSize: 20, fontWeight: 'bold', marginRight: 20},
   rightHeader: {flexDirection: 'row', alignItems: 'center'},
   iconButton: {
     marginLeft: ResponsiveUI.margin.left(10),
@@ -373,5 +350,3 @@ const styles = StyleSheet.create({
     color: '#000',
   },
 });
-
-export default ChatScreen;

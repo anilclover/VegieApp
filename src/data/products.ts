@@ -528,6 +528,30 @@ export const recents: Call[] = [
   },
 ];
 
+export const SLIDES: SlideData[] = [
+  {
+    id: '1',
+    title: 'Easy To Search',
+    description: 'Mascenas elementum est ut nulla blandit ultricies...',
+    image: require('../assets/images/banners/flash-deal-banner.png'),
+    color: '#8A2BE2',
+  },
+  {
+    id: '2',
+    title: 'Easy To Access',
+    description: 'Lorem ipsum dolor sit amet...',
+    image: require('../assets/images/banners/flash-deal-banner.png'),
+    color: '#8A2BE2',
+  },
+  {
+    id: '3',
+    title: 'Easy To Manage',
+    description: 'Mauris vulputate libero non metus...',
+    image: require('../assets/images/banners/flash-deal-banner.png'),
+    color: '#8A2BE2',
+  },
+];
+
 
 export type Phone = {
   type: string;
@@ -543,3 +567,21 @@ export type Contact = {
   photo: string | null;
   note: string | null;
 };
+
+// types.ts
+
+export interface SlideData {
+  id: string;
+  title: string;
+  description: string;
+  image: number; // Use 'number' for local images (require('./path'))
+  color: string; // To change the primary color per slide, like the purple
+}
+
+export interface OnboardingItemProps {
+  id?: string;
+  title: string;
+  description: string;
+  image: any;
+  color: string;
+}

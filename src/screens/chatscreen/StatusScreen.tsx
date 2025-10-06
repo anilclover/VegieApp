@@ -1,33 +1,45 @@
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import React, {useState} from 'react';
-import CustomBottomAlert from '../../components/CustomBottomAlert';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import BottomAlertModal from '../../components/BottomAlertModal'; // 👈 import your modal
+import { navigate } from '../../utils/NavigationUtils';
 
 const StatusScreen = () => {
   const [visible, setVisible] = useState(false);
+  const locationAlertImage = require('../../assets/images/icons/location_alert.png');
+
+
+  const getAvailableTimeSlots = () => { 
+    setVisible(false);
+    navigate('SearchLocation');
+
+
+  }
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.openBtn} onPress={() => setVisible(true)}>
+      <TouchableOpacity
+        style={styles.openBtn}
+        onPress={() => setVisible(true)} // 👈 open modal
+      >
         <Text style={styles.openText}>Show Custom Bottom Alert</Text>
       </TouchableOpacity>
 
-      <CustomBottomAlert
-        visible={visible}
-        title="⚠️ Delete Item?"
-        message="Are you sure you want to delete this item? This action cannot be undone."
-        onClose={() => setVisible(false)}
-        actions={[
-          {
-            label: 'Delete',
-            type: 'destructive',
-            onPress: () => console.log('Deleted ✅'),
-          },
-          {
-            label: 'Cancel',
-            type: 'cancel',
-            onPress: () => console.log('Cancelled ❌'),
-          },
-          
-        ]}
+      <BottomAlertModal
+        isVisible={visible} // 👈 matches your modal prop
+        onClose={() =>
+          // navigate('SearchLocation')
+           
+        getAvailableTimeSlots()
+        }
+        onActionPress={() => {
+          console.log('Delete pressed ✅');
+          setVisible(false);
+        }}
+        imageSource={locationAlertImage} // Pass static require
+        title="Location"
+        description="Allow Bruno's Barbers to accessour location to help you find nearby branches."
+        skipButtonText="Skip for now"
+        actionButtonText="Allow"
       />
     </View>
   );

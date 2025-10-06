@@ -1,5 +1,15 @@
-import {NativeModules} from 'react-native';
+import React, {useRef, useEffect} from 'react';
+import {
+  NativeModules,
+  ToastAndroid,
+  Animated,
+  Pressable,
+  StyleSheet,
+  ViewStyle,
+  StyleProp,
+} from 'react-native';
 
+import {PermissionsAndroid} from 'react-native';
 // import {requestContactsPermission} from './permissions';
 const {ScreenshotModule, ContactsModule} = NativeModules;
 
@@ -35,8 +45,6 @@ export async function loadContacts() {
   return contacts;
 }
 
-import {PermissionsAndroid} from 'react-native';
-
 export async function requestContactsPermission() {
   try {
     const granted = await PermissionsAndroid.request(
@@ -53,3 +61,22 @@ export async function requestContactsPermission() {
     return false;
   }
 }
+
+export const showToastWithGravity = (message: string) => {
+  ToastAndroid.showWithGravity(
+    message,
+    ToastAndroid.SHORT,
+    ToastAndroid.CENTER,
+  );
+};
+
+export const showToastWithGravityAndOffset = (message: string) => {
+  ToastAndroid.showWithGravityAndOffset(
+    message,
+    ToastAndroid.LONG,
+    ToastAndroid.BOTTOM,
+    25,
+    50,
+  );
+};
+ 

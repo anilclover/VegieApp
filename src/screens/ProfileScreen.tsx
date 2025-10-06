@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import {useTheme} from '../context/ThemeContext';
 import {useNavigation} from '@react-navigation/native';
+import {navigate} from '../utils/NavigationUtils';
 
 const ProfileScreen = () => {
   const {colors} = useTheme();
@@ -191,7 +192,8 @@ const ProfileScreen = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.menuItem, {backgroundColor: colors.surface}]}>
+            style={[styles.menuItem, {backgroundColor: colors.surface}]}
+            onPress={() => navigate('SettingsScreen')}>
             <Text style={styles.menuIcon}>⚙️</Text>
             <Text style={[styles.menuText, {color: colors.text}]}>
               Settings

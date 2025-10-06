@@ -10,15 +10,21 @@ import BiometricLoginScreen from '../screens/BiometricLoginScreen';
 import ChatScreen from '../screens/chatscreen/ChatScreen';
 import AllChats from '../screens/chatscreen/AllChats';
 import CallDetailsScreen from '../screens/chatscreen/CallDetailsScreen';
-import { NavigationContainer } from '@react-navigation/native';
-import { navigationRef } from '../utils/NavigationUtils';
+import {NavigationContainer} from '@react-navigation/native';
+import {navigationRef} from '../utils/NavigationUtils';
+import SettingsScreen from '../screens/SettingsScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
+import SearchLocation from '../screens/SearchLocation';
 
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
   return (
     <NavigationContainer ref={navigationRef}>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Navigator
+        screenOptions={{headerShown: false}}
+        initialRouteName="Splash">
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="BiometricLogin" component={BiometricLoginScreen} />
         <Stack.Screen name="Main" component={TabNavigator} />
@@ -29,6 +35,8 @@ const AppNavigator = () => {
         <Stack.Screen name="ChatScreen" component={ChatScreen} />
         <Stack.Screen name="AllChats" component={AllChats} />
         <Stack.Screen name="CallDetailsScreen" component={CallDetailsScreen} />
+        <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+        <Stack.Screen name="SearchLocation" component={SearchLocation} />
       </Stack.Navigator>
     </NavigationContainer>
   );

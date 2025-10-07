@@ -214,8 +214,8 @@ const SearchLocation = () => {
           showsUserLocation={true}
           showsMyLocationButton={false}
           initialRegion={{
-            latitude: 19.17022,
-            longitude: 73.001741,
+            latitude: 17.17022,
+            longitude: 72.001741,
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}>

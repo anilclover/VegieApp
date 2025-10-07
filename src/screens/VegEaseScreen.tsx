@@ -117,9 +117,10 @@ const VegEaseScreen = () => {
       const response = await fetch(url);
       const data = await response.json();
       console.log('📍 Address response:', data);
+      console.log('Formated Address in JSON format ' + JSON.stringify(data));
 
       if (data.results && data.results.length > 0) {
-        const fullAddress = data.results[5].formatted_address;
+        const fullAddress = data.results[0].formatted_address;
         setAddress(fullAddress);
       } else {
         setAddress('Address not found');
@@ -382,7 +383,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     overflow: 'hidden',
     justifyContent: 'space-between',
-    
   },
   cardContent: {padding: 12, alignItems: 'center', position: 'relative'},
   discountBadge: {

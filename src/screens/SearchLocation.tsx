@@ -178,7 +178,7 @@ const SearchLocation = () => {
           <Text style={styles.searchIcon}>🔍</Text>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search for area, street name..."
+            placeholder="Search Location..."
             value={query}
             onChangeText={searchPlaces}
             placeholderTextColor="#999"
@@ -211,8 +211,14 @@ const SearchLocation = () => {
           style={styles.map}
           region={location}
           onPress={onMapPress}
-          showsUserLocation={false}
-          showsMyLocationButton={false}>
+          showsUserLocation={true}
+          showsMyLocationButton={false}
+          initialRegion={{
+            latitude: 19.17022,
+            longitude: 73.001741,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}>
           <Marker coordinate={location} />
         </MapView>
 
@@ -290,12 +296,12 @@ const styles = StyleSheet.create({
     borderColor: '#f2f2f2',
   },
   searchIcon: {
-    fontSize: 18,
+    fontSize: 16,
     marginRight: 10,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
     color: '#000',
   },
   suggestionsContainer: {
@@ -338,9 +344,9 @@ const styles = StyleSheet.create({
   },
   addressOverlay: {
     position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
+    bottom: 5,
+    left: 5,
+    right: 5,
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 12,
@@ -356,7 +362,7 @@ const styles = StyleSheet.create({
   },
   locationIcon: {
     fontSize: 18,
-    marginRight: 12,
+    marginRight: 8,
   },
   addressTextContainer: {
     flex: 1,
@@ -367,8 +373,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   changeButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 1,
   },
   changeText: {
     fontSize: 14,

@@ -8,26 +8,29 @@ import {
   Dimensions,
   FlatList,
   Platform,
+  Image,
   PermissionsAndroid,
 } from 'react-native';
-import MapView, {Marker} from 'react-native-maps';
+import MapView, {Marker, Region} from 'react-native-maps';
 import {useNavigation} from '@react-navigation/native';
 import Geolocation from 'react-native-geolocation-service';
 import {goBack} from '../utils/NavigationUtils';
+import Constants from '../constants/Constants';
 
 interface PlacePrediction {
   place_id: string;
   description: string;
 }
 
-const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
+const {width: screenWidth} = Dimensions.get('window');
 
 const SearchLocation = () => {
   const navigation = useNavigation();
   const mapRef = useRef<MapView>(null);
+
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<PlacePrediction[]>([]);
-  const [location, setLocation] = useState({
+  const [location, setLocation] = useState<Region>({
     latitude: 14.5995,
     longitude: 120.9842,
     latitudeDelta: 0.01,
@@ -36,8 +39,6 @@ const SearchLocation = () => {
   const [selectedAddress, setSelectedAddress] = useState('');
   const [showCurrentLocationButton, setShowCurrentLocationButton] =
     useState(true);
-
-  const GOOGLE_API_KEY = 'AIzaSyBkCIKQZ1ydCbRHBrXmC8hUh2dsrnCDEWI';
 
   useEffect(() => {
     getAddressFromCoordinates(location.latitude, location.longitude);
@@ -48,7 +49,7 @@ const SearchLocation = () => {
     if (text.length > 2) {
       try {
         const response = await fetch(
-          `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&key=${GOOGLE_API_KEY}`,
+          `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&key=${Constants.GOOGLE_API_KEY}`,
         );
         const data = await response.json();
         setSuggestions(data.predictions || []);
@@ -64,13 +65,13 @@ const SearchLocation = () => {
   const selectPlace = async (placeId: string, description: string) => {
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`,
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${Constants.GOOGLE_API_KEY}`,
       );
       const data = await response.json();
 
-      if (data.result && data.result.geometry) {
+      if (data.result?.geometry?.location) {
         const {lat, lng} = data.result.geometry.location;
-        const newLocation = {
+        const newLocation: Region = {
           latitude: lat,
           longitude: lng,
           latitudeDelta: 0.01,
@@ -81,9 +82,7 @@ const SearchLocation = () => {
         setQuery('');
         setSuggestions([]);
 
-        if (mapRef.current) {
-          mapRef.current.animateToRegion(newLocation, 1000);
-        }
+        mapRef.current?.animateToRegion(newLocation, 1000);
       }
     } catch (error) {
       console.error('Place selection error:', error);
@@ -96,12 +95,13 @@ const SearchLocation = () => {
   ) => {
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_API_KEY}`,
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${Constants.GOOGLE_API_KEY}`,
       );
       const data = await response.json();
-
-      if (data.results && data.results.length > 0) {
+      if (data.results?.length > 0) {
         setSelectedAddress(data.results[0].formatted_address);
+      } else {
+        setSelectedAddress('Selected Location');
       }
     } catch (error) {
       console.error('Geocoding error:', error);
@@ -111,12 +111,7 @@ const SearchLocation = () => {
 
   const onMapPress = (event: any) => {
     const {latitude, longitude} = event.nativeEvent.coordinate;
-    setLocation({
-      latitude,
-      longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    });
+    setLocation({...location, latitude, longitude});
   };
 
   const useCurrentLocation = async () => {
@@ -133,25 +128,22 @@ const SearchLocation = () => {
         hasPermission = granted === PermissionsAndroid.RESULTS.GRANTED;
       }
 
-      if (hasPermission) {
-        Geolocation.getCurrentPosition(
-          position => {
-            const newLocation = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            };
-            setLocation(newLocation);
+      if (!hasPermission) return;
 
-            if (mapRef.current) {
-              mapRef.current.animateToRegion(newLocation, 1000);
-            }
-          },
-          error => console.warn('Location error:', error),
-          {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-        );
-      }
+      Geolocation.getCurrentPosition(
+        position => {
+          const newLocation: Region = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          };
+          setLocation(newLocation);
+          mapRef.current?.animateToRegion(newLocation, 1000);
+        },
+        error => console.warn('Location error:', error),
+        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      );
     } catch (error) {
       console.warn('Permission error:', error);
     }
@@ -166,10 +158,11 @@ const SearchLocation = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={() => goBack()}
           style={styles.backButton}>
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>Search Location</Text>
       </View>
 
       {/* Search Bar */}
@@ -186,7 +179,7 @@ const SearchLocation = () => {
         </View>
       </View>
 
-      {/* Search Suggestions */}
+      {/* Suggestions */}
       {suggestions.length > 0 && (
         <View style={styles.suggestionsContainer}>
           <FlatList
@@ -205,24 +198,51 @@ const SearchLocation = () => {
       )}
 
       {/* Map */}
-      <View style={styles.mapContainer}>
+      {/* <View style={styles.mapContainer}>
         <MapView
           ref={mapRef}
           style={styles.map}
           region={location}
           onPress={onMapPress}
           showsUserLocation={true}
+          showsMyLocationButton={false}>
+          <Marker coordinate={location}>
+            <Image
+              source={require('../assets/images/products/tomato.png')}
+              style={{width: 40, height: 40}}
+              resizeMode="contain"
+            />
+          </Marker>
+        </MapView> */}
+
+      {/* Map */}
+      <View style={styles.mapContainer}>
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          initialRegion={
+            location || {
+              latitude: 14.5995, // fallback
+              longitude: 120.9842,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            }
+          }
+          showsUserLocation={true}
           showsMyLocationButton={false}
-          initialRegion={{
-            latitude: 17.17022,
-            longitude: 72.001741,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}>
-          <Marker coordinate={location} />
+          onPress={onMapPress}>
+          {location && (
+            <Marker coordinate={location}>
+              <Image
+                source={require('../assets/images/products/tomato.png')}
+                style={{width: 40, height: 40}}
+                resizeMode="contain"
+              />
+            </Marker>
+          )}
         </MapView>
 
-        {/* Selected Address Overlay */}
+        {/* Selected Address */}
         <View style={styles.addressOverlay}>
           <View style={styles.addressRow}>
             <Text style={styles.locationIcon}>📍</Text>
@@ -240,7 +260,6 @@ const SearchLocation = () => {
 
       {/* Bottom Section */}
       <View style={styles.bottomSection}>
-        {/* Use Current Location Button */}
         {showCurrentLocationButton && (
           <TouchableOpacity
             style={styles.currentLocationButton}
@@ -249,8 +268,6 @@ const SearchLocation = () => {
             <Text style={styles.currentLocationText}>Use Current Location</Text>
           </TouchableOpacity>
         )}
-
-        {/* Continue Button */}
         <TouchableOpacity
           style={styles.continueButton}
           onPress={handleContinue}>
@@ -264,28 +281,23 @@ const SearchLocation = () => {
 export default SearchLocation;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
+  container: {flex: 1, backgroundColor: '#fff'},
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingTop: Platform.OS === 'ios' ? 50 : 20,
     paddingHorizontal: 20,
     paddingBottom: 10,
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-  },
-  backArrow: {
-    fontSize: 24,
+  backButton: {width: 40, height: 40, justifyContent: 'center'},
+  backArrow: {fontSize: 24, color: '#000'},
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
     color: '#000',
+    marginLeft: 10,
   },
-  searchContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 10,
-  },
+  searchContainer: {paddingHorizontal: 20, marginBottom: 10},
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -295,15 +307,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#f2f2f2',
   },
-  searchIcon: {
-    fontSize: 16,
-    marginRight: 10,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: '#000',
-  },
+  searchIcon: {fontSize: 16, marginRight: 10},
+  searchInput: {flex: 1, fontSize: 14, color: '#000'},
   suggestionsContainer: {
     backgroundColor: '#fff',
     marginHorizontal: 20,
@@ -323,15 +328,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
-  suggestionIcon: {
-    fontSize: 16,
-    marginRight: 12,
-  },
-  suggestionText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#333',
-  },
+  suggestionIcon: {fontSize: 16, marginRight: 12},
+  suggestionText: {flex: 1, fontSize: 14, color: '#333'},
   mapContainer: {
     flex: 1,
     marginHorizontal: 20,
@@ -339,9 +337,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 20,
   },
-  map: {
-    flex: 1,
-  },
+  map: {flex: 1},
   addressOverlay: {
     position: 'absolute',
     bottom: 5,
@@ -356,30 +352,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
-  addressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  locationIcon: {
-    fontSize: 18,
-    marginRight: 8,
-  },
-  addressTextContainer: {
-    flex: 1,
-  },
-  addressText: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '500',
-  },
-  changeButton: {
-    paddingHorizontal: 1,
-  },
-  changeText: {
-    fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '600',
-  },
+  addressRow: {flexDirection: 'row', alignItems: 'center'},
+  locationIcon: {fontSize: 18, marginRight: 8},
+  addressTextContainer: {flex: 1},
+  addressText: {fontSize: 16, color: '#333', fontWeight: '500'},
+  changeButton: {paddingHorizontal: 6},
+  changeText: {fontSize: 14, color: '#007AFF', fontWeight: '600'},
   bottomSection: {
     paddingHorizontal: 20,
     paddingBottom: Platform.OS === 'ios' ? 40 : 20,
@@ -393,24 +371,13 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     marginBottom: 15,
   },
-  currentLocationIcon: {
-    fontSize: 18,
-    marginRight: 8,
-  },
-  currentLocationText: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '500',
-  },
+  currentLocationIcon: {fontSize: 18, marginRight: 8},
+  currentLocationText: {fontSize: 16, color: '#333', fontWeight: '500'},
   continueButton: {
     backgroundColor: '#000',
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
   },
-  continueText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  continueText: {color: '#fff', fontSize: 16, fontWeight: '600'},
 });

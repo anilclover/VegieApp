@@ -585,3 +585,125 @@ export interface OnboardingItemProps {
   image: any;
   color: string;
 }
+
+
+export const productsData = [
+  {
+    id: '1',
+    category: 'Skincare',
+    name: 'WishCare Sunscreen Body Lotion',
+    price: 320,
+  },
+  {
+    id: '2',
+    category: 'Sun Care',
+    name: 'Aqualogica Glow+ Dewy Sunscreen Gel',
+    price: 355,
+  },
+  {
+    id: '3',
+    category: 'Haircare',
+    name: 'Deep Impact Freshness Deodorant',
+    price: 380,
+  },
+  {id: '4', category: 'Fragrances', name: 'Cool Mist Perfume', price: 420},
+  {
+    id: '5',
+    category: 'Skincare',
+    name: 'WishCare Sunscreen Body Lotion',
+    price: 320,
+  },
+  {
+    id: '6',
+    category: 'Sun Care',
+    name: 'Aqualogica Glow+ Dewy Sunscreen Gel',
+    price: 355,
+  },
+  {
+    id: '7',
+    category: 'Haircare',
+    name: 'Deep Impact Freshness Deodorant',
+    price: 380,
+  },
+  {id: '8', category: 'Fragrances', name: 'Cool Mist Perfume', price: 420},
+
+  {
+    id: '9',
+    category: 'Skincare',
+    name: 'WishCare Sunscreen Body Lotion',
+    price: 320,
+  },
+  {
+    id: '10',
+    category: 'Sun Care',
+    name: 'Aqualogica Glow+ Dewy Sunscreen Gel',
+    price: 355,
+  },
+  {
+    id: '11',
+    category: 'Haircare',
+    name: 'Deep Impact Freshness Deodorant',
+    price: 380,
+  },
+  {id: '12', category: 'Fragrances', name: 'Cool Mist Perfume', price: 420},
+  {
+    id: '13',
+    category: 'Skincare',
+    name: 'WishCare Sunscreen Body Lotion',
+    price: 320,
+  },
+  {
+    id: '14',
+    category: 'Sun Care',
+    name: 'Aqualogica Glow+ Dewy Sunscreen Gel',
+    price: 355,
+  },
+  {
+    id: '15',
+    category: 'Haircare',
+    name: 'Deep Impact Freshness Deodorant',
+    price: 380,
+  },
+  {id: '16', category: 'Fragrances', name: 'Cool Mist Perfume', price: 420},
+
+  {
+    id: '17',
+    category: 'Skincare',
+    name: 'WishCare Sunscreen Body Lotion',
+    price: 320,
+  },
+  {
+    id: '18',
+    category: 'Sun Care',
+    name: 'Aqualogica Glow+ Dewy Sunscreen Gel',
+    price: 355,
+  },
+  {
+    id: '19',
+    category: 'Haircare',
+    name: 'Deep Impact Freshness Deodorant',
+    price: 380,
+  },
+  {id: '20', category: 'Fragrances', name: 'Cool Mist Perfume', price: 420},
+  {
+    id: '21',
+    category: 'Skincare',
+    name: 'WishCare Sunscreen Body Lotion',
+    price: 320,
+  },
+  {
+    id: '22',
+    category: 'Sun Care',
+    name: 'Aqualogica Glow+ Dewy Sunscreen Gel',
+    price: 355,
+  },
+  {
+    id: '23',
+    category: 'Haircare',
+    name: 'Deep Impact Freshness Deodorant',
+    price: 380,
+  },
+  {id: '24', category: 'Fragrances', name: 'Cool Mist Perfume', price: 420},
+
+  // add more products...
+];

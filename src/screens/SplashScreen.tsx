@@ -23,7 +23,7 @@ const SplashScreen = () => {
   };
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>VegEase</Text>
+      {/* <Text style={styles.logo}>VegEase</Text> */}
       <ActivityIndicator size="large" color="#fff" style={{marginTop: 20}} />
       {/* <Image
         source={{
@@ -31,12 +31,12 @@ const SplashScreen = () => {
         }}
         style={styles.gif}
       /> */}
-
+      {/* diwali-1258_512.gif */}
       <Image
-        // source={require('./assets/yourGif.gif')} // Local GIF
-        source={{
-          uri: 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif',
-        }}
+        source={require('../assets/images/banners/diwali-1258_512.gif')} // Local GIF
+        // source={{
+        //   uri: 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif',
+        // }}
         style={StyleSheet.absoluteFill} // Fills the entire screen
         resizeMode="cover" // "cover" keeps aspect ratio, fills screen
       />

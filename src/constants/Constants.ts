@@ -8,6 +8,7 @@ const Constants = {
   APP_NAME: 'VegEase',
   WELCOME_MESSAGE: 'Welcome to VegEase!',
   ERROR_MESSAGE: 'Something went wrong, please try again.',
+  GOOGLE_API_KEY: 'AIzaSyBkCIKQZ1ydCbRHBrXmC8hUh2dsrnCDEWI',
 };
 
 export default Constants;

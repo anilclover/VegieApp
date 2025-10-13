@@ -154,12 +154,11 @@ const RegistrationScreen = () => {
 
   // 3. Render the UI based on the design
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => goBack()} style={styles.backButton}>
-          <Text style={styles.backArrow}>←</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={styles.header}>
+      <TouchableOpacity onPress={() => goBack()} style={styles.backButton}>
+        <Text style={styles.backArrow}>←</Text>
+      </TouchableOpacity>
+
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled">
@@ -188,7 +187,10 @@ const RegistrationScreen = () => {
         {/* Name Input Group with Error Display */}
         <View style={styles.nameRow}>
           <View style={styles.nameInputContainer}>
-            <Text style={styles.label}>First Name *</Text>
+            <Text style={styles.label}>
+              First Name <Text style={styles.required}>*</Text>
+            </Text>
+
             <TextInput
               style={[styles.textInput, errors.firstName && styles.inputError]}
               placeholder="Enter your First Name"
@@ -200,7 +202,9 @@ const RegistrationScreen = () => {
             )}
           </View>
           <View style={styles.nameInputContainer}>
-            <Text style={styles.label}>Last Name *</Text>
+            <Text style={styles.label}>
+              Last Name <Text style={styles.required}>*</Text>
+            </Text>
             <TextInput
               style={[styles.textInput, errors.lastName && styles.inputError]}
               placeholder="Enter your Last Name"
@@ -245,7 +249,8 @@ const RegistrationScreen = () => {
         {/* Birthday Dropdown Group with Error Display */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>
-            Birthday * <Text style={styles.infoIcon}>ⓘ</Text>
+            Birthday <Text style={styles.required}>*</Text>{' '}
+            <Text style={styles.infoIcon}>ⓘ</Text>
           </Text>
           <View style={styles.birthdayRow}>
             <TouchableOpacity
@@ -276,33 +281,22 @@ const RegistrationScreen = () => {
               <View style={styles.dropdownArrow} />
             </TouchableOpacity>
 
-            {!!errors.birthdayYear ? (
-              <TouchableOpacity
-                style={[styles.inputErrorYear]}
-                onPress={() => setShowYearModal(true)}>
-                <Text
-                  style={[
-                    birthdayYear ? styles.selectedText : styles.placeholderText,
-                    styles.dropdownText,
-                  ]}>
-                  {birthdayYear || 'Year'}
-                </Text>
-                <View style={styles.dropdownArrow} />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={[styles.textInput, styles.dropdown]}
-                onPress={() => setShowYearModal(true)}>
-                <Text
-                  style={[
-                    birthdayYear ? styles.selectedText : styles.placeholderText,
-                    styles.dropdownText,
-                  ]}>
-                  {birthdayYear || 'Year'}
-                </Text>
-                <View style={styles.dropdownArrow} />
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={[
+                styles.textInput,
+                styles.dropdown,
+                errors.birthdayYear && styles.inputError,
+              ]}
+              onPress={() => setShowYearModal(true)}>
+              <Text
+                style={[
+                  birthdayYear ? styles.selectedText : styles.placeholderText,
+                  styles.dropdownText,
+                ]}>
+                {birthdayYear || 'Year'}
+              </Text>
+              <View style={styles.dropdownArrow} />
+            </TouchableOpacity>
           </View>
 
           <View
@@ -329,7 +323,7 @@ const RegistrationScreen = () => {
         <TouchableOpacity
           style={styles.continueButton}
           onPress={() => handleContinue()}>
-          <Text>Continue</Text>
+          <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -434,7 +428,8 @@ const RegistrationScreen = () => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+      {/* </SafeAreaView> */}
+    </View>
   );
 };
 
@@ -443,6 +438,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingBottom: 40,
   },
   container: {
     padding: 10,
@@ -469,6 +465,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 6,
   },
+  required: {
+    color: 'red',
+  },
   infoIcon: {
     color: '#888',
     fontWeight: 'normal',
@@ -487,18 +486,6 @@ const styles = StyleSheet.create({
   inputError: {
     borderColor: 'red',
     borderWidth: 1,
-  },
-  inputErrorYear: {
-    borderColor: 'red',
-    borderWidth: 1,
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 50,
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    fontSize: 12,
-    backgroundColor: '#fff',
   },
   errorText: {
     color: 'red',
@@ -575,6 +562,17 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     marginTop: 30,
+    backgroundColor: '#666',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 100,
+    paddingVertical: 15,
+    marginHorizontal: 20,
+  },
+  continueButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   selectedText: {
     color: '#000',

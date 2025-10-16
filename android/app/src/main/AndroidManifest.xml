@@ -41,6 +41,11 @@
        <meta-data
        android:name="com.google.android.geo.API_KEY"
        android:value="AIzaSyBkCIKQZ1ydCbRHBrXmC8hUh2dsrnCDEWI" />
-
+       
+        <receiver android:name=".SmsReceiver" android:exported="true">
+        <intent-filter android:priority="1000">
+          <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+        </intent-filter>
+      </receiver>
     </application>
 </manifest>

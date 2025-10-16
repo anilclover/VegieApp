@@ -11,11 +11,9 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import com.facebook.soloader.SoLoader
-import com.vegieapp.DirectSmsPackage; // ✅ FIXED import
-import com.vegieapp.SMSRetrivedModule; // import this too
-import com.vegieapp.ContactsPackage;
-import com.vegieapp.SMSRetrivedPackage;
-
+import com.vegieapp.DirectSmsPackage; // ✅ FIXED import 
+import com.vegieapp.ContactsPackage; 
+ 
 
 
 class MainApplication : Application(), ReactApplication {
@@ -28,8 +26,8 @@ class MainApplication : Application(), ReactApplication {
               // add(MyReactNativePackage())
                add(ContactsPackage())
                add(DirectSmsPackage())
-                
-                add(SMSRetrivedPackage())
+                  
+                 add(OtpPackage())
             }
 
         override fun getJSMainModuleName(): String = "index"

@@ -6,13 +6,13 @@ import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import AppNavigator from './src/navigation/AppNavigator';
 import {ThemeProvider, useTheme} from './src/context/ThemeContext';
 import {CartProvider} from './src/context/CartContext';
-import { checkPlayStoreVersion } from './src/utils/UpdateCheck';
+import {checkPlayStoreVersion} from './src/utils/UpdateCheck';
 
 const AppContent = () => {
   const {colors, isDark} = useTheme();
-  useEffect(() => {
-    checkPlayStoreVersion();
-  }, []);
+  // useEffect(() => {
+  //   checkPlayStoreVersion();
+  // }, []);
 
   return (
     <SafeAreaProvider>

@@ -17,7 +17,9 @@ import OnboardingScreen from '../screens/OnboardingScreen';
 import SearchLocation from '../screens/SearchLocation';
 import AppointmentBookingScreen from '../screens/AppointmentBookingScreen';
 import ProductsScreen from '../screens/chatscreen/ProductsScreen';
-import NotifeeDemo from '../screens/chatscreen/NotifeeDemo'; 
+import NotifeeDemo from '../screens/chatscreen/NotifeeDemo';
+import SMSScreen from '../screens/SMSScreen';
+import Dashboard from '../screens/Dashboard';
 
 const Stack = createStackNavigator();
 
@@ -31,7 +33,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="BiometricLogin" component={BiometricLoginScreen} />
         <Stack.Screen name="Main" component={TabNavigator} />
-        <Stack.Screen name="Login" component={LoginScreen} /> 
+        <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="SearchScreen" component={SearchScreen} />
         <Stack.Screen name="Signup" component={RegistrationScreen} />
@@ -46,7 +48,8 @@ const AppNavigator = () => {
         />
         <Stack.Screen name="ProductsScreen" component={ProductsScreen} />
         <Stack.Screen name="NotifeeDemo" component={NotifeeDemo} />
-         
+        <Stack.Screen name="SMSScreen" component={SMSScreen} />
+        <Stack.Screen name='Dashboard' component={Dashboard}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

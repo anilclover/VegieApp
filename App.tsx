@@ -1,13 +1,18 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+
 import {StatusBar, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import AppNavigator from './src/navigation/AppNavigator';
 import {ThemeProvider, useTheme} from './src/context/ThemeContext';
 import {CartProvider} from './src/context/CartContext';
+import { checkPlayStoreVersion } from './src/utils/UpdateCheck';
 
 const AppContent = () => {
   const {colors, isDark} = useTheme();
+  useEffect(() => {
+    checkPlayStoreVersion();
+  }, []);
 
   return (
     <SafeAreaProvider>

@@ -1,3 +1,7 @@
+// versionConfig.ts
+export const CURRENT_VERSION = '1.0.0'; // the version installed in the app
+export const PACKAGE_NAME = 'com.vegieapp'; // your app package name
+
 export const vegetables = [
   {
     id: 'v1',
@@ -552,7 +556,6 @@ export const SLIDES: SlideData[] = [
   },
 ];
 
-
 export type Phone = {
   type: string;
   number: string;
@@ -585,7 +588,6 @@ export interface OnboardingItemProps {
   image: any;
   color: string;
 }
-
 
 export const productsData = [
   {
@@ -707,3 +709,37 @@ export const productsData = [
 
   // add more products...
 ];
+
+export const projectStatusData = [
+  {label: 'Completed', percentage: '57.6', color: '#000'},
+  {label: 'In Progress', percentage: '26.4', color: '#4CAF50'},
+  {label: 'Behind', percentage: '6', color: '#7E57C2'},
+  {label: 'In Queue', percentage: '10', color: 'pink'},
+];
+
+export const tasksData = [
+  {name: 'Coffee detail page', status: 'In Progress', color: '#7E57C2'},
+  {name: 'Drinking bottle graphics', status: 'Complete', color: '#4CAF50'},
+  {name: 'App design and developm...', status: 'Pending', color: '#00B0FF'},
+  {name: 'Poster illustration design', status: 'Approved', color: '#FFB300'},
+];
+
+// --- Stat Card Component ---
+export type StatCardProps = {
+  title: string;
+  value: string;
+  percentage: string;
+  isPositive: boolean;
+  iconName: string;
+  index?: number;
+};
+// --- Task Row Component ---
+export type TaskRowProps = {
+  taskName: string;
+  status: string;
+  statusColor: string;
+};
+
+export type DonutChartProps = {
+  data: Array<{label: string; percentage: string; color: string}>;
+};

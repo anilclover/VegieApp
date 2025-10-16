@@ -11,12 +11,21 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {requestAllPermissions} from '../utils/PermissionManager';
 import BiometricButton from '../components/BiometricButton';
 import ResponsiveUI from '../utils/Responsive';
+import {
+  configureGoogleSignIn,
+  signInWithGoogle,
+} from '../utils/auth/googleSignIn';
+import {signInWithApple} from '../utils/auth/appleSignIn';
+import {navigate} from '../utils/NavigationUtils';
 const {height} = Dimensions.get('window');
+
+// import {configureGoogleSignIn, signInWithGoogle} from './socialLogin';
 
 const logos = [
   require('../assets/images/banners/flash-deal-banner.png'),
@@ -24,10 +33,18 @@ const logos = [
   require('../assets/images/banners/vegetables-banner.png'),
 ];
 
+type OtpScreenParams = {
+  mobile: string;
+  otp: string;
+  userId?: number;
+};
 const LoginScreen = () => {
   const scrollY = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation();
   useEffect(() => {
+    // configureGoogleSignIn('YOUR_WEB_CLIENT_ID.apps.googleusercontent.com'); // Only once in the app
+    configureGoogleSignIn('1234567890-abcdefg.apps.googleusercontent.com');
+
     Animated.loop(
       Animated.timing(scrollY, {
         toValue: 1,
@@ -37,6 +54,22 @@ const LoginScreen = () => {
       {iterations: -1},
     ).start();
   }, [scrollY]);
+
+  const handleGoogleLogin = async () => {
+    if (Platform.OS === 'android') {
+      const result = await signInWithGoogle();
+      if (result.success) {
+        Alert.alert('Login Success', `Welcome ${JSON.stringify(result)}`);
+        // You can send result.data.idToken to your backend
+      } else {
+        Alert.alert('Login Failed', result.error);
+      }
+    } else {
+      // const user = await signInWithApple();
+      // Alert.alert('Welcome', user.fullName?.givenName || 'Apple User');
+      // navigation.navigate('Main' as never);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -99,7 +132,9 @@ const LoginScreen = () => {
               style={styles.button}
               onPress={() => {
                 console.log('📱 Regular login button pressed');
-                navigation.navigate('Main' as never);
+                navigate('SMSScreen', {
+                  mobile: 9576758792,
+                });
               }}>
               <Text style={styles.buttonText}>Continue</Text>
             </TouchableOpacity>
@@ -115,6 +150,10 @@ const LoginScreen = () => {
               }
               style={styles.biometricButton}
             />
+
+            <TouchableOpacity style={styles.button} onPress={handleGoogleLogin}>
+              <Text style={styles.buttonText}>Login with Google</Text>
+            </TouchableOpacity>
 
             <Text style={styles.terms}>
               By continuing you agree to our{' '}

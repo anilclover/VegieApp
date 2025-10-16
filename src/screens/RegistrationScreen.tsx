@@ -154,7 +154,7 @@ const RegistrationScreen = () => {
 
   // 3. Render the UI based on the design
   return (
-    <View style={styles.header}>
+    <View style={styles.container}>
       <TouchableOpacity onPress={() => goBack()} style={styles.backButton}>
         <Text style={styles.backArrow}>←</Text>
       </TouchableOpacity>
@@ -173,14 +173,23 @@ const RegistrationScreen = () => {
         {/* Mobile Number Input Group */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Mobile Number</Text>
-          <View style={styles.phoneInputContainer}>
-            <Text style={styles.countryCode}>+63</Text>
-            <TextInput
-              style={styles.textInput}
-              value={mobileNumber}
-              onChangeText={setMobileNumber}
-              keyboardType="phone-pad"
-            />
+          <View style={styles.phoneRow}>
+            <View style={styles.countryCodeContainer}>
+              <TextInput
+                style={styles.countryCodeInput}
+                value="+63"
+                editable={false}
+              />
+            </View>
+            <View style={styles.phoneNumberContainer}>
+              <TextInput
+                style={styles.phoneNumberInput}
+                value={mobileNumber}
+                onChangeText={setMobileNumber}
+                keyboardType="phone-pad"
+                placeholder="Enter phone number"
+              />
+            </View>
           </View>
         </View>
 
@@ -319,13 +328,13 @@ const RegistrationScreen = () => {
         </View>
 
         {/* Continue Button with onPress={handleContinue} */}
-
-        <TouchableOpacity
-          style={styles.continueButton}
-          onPress={() => handleContinue()}>
-          <Text style={styles.continueButtonText}>Continue</Text>
-        </TouchableOpacity>
       </ScrollView>
+
+      <TouchableOpacity
+        style={styles.continueButton}
+        onPress={() => handleContinue()}>
+        <Text style={styles.continueButtonText}>Continue</Text>
+      </TouchableOpacity>
 
       {/* Month Modal */}
       <Modal visible={showMonthModal} transparent animationType="slide">
@@ -437,12 +446,11 @@ const RegistrationScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
     paddingBottom: 40,
   },
   container: {
     padding: 10,
-    paddingBottom: 40,
+    backgroundColor: '#fff',
   },
   header: {
     fontSize: 28,
@@ -493,23 +501,36 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginLeft: 5,
   },
-  phoneInputContainer: {
+  phoneRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
-    overflow: 'hidden',
+    justifyContent: 'space-between',
   },
-  countryCode: {
-    backgroundColor: '#eee',
+  countryCodeContainer: {
+    flex: 0.3,
+    marginRight: 8,
+  },
+  countryCodeInput: {
     height: 50,
+    borderColor: '#ccc',
+    borderWidth: 0.5,
+    borderRadius: 8,
     paddingHorizontal: 15,
-    lineHeight: 50,
     fontSize: 16,
+    backgroundColor: '#f5f5f5',
+    textAlign: 'center',
     fontWeight: '500',
-    borderRightColor: '#ccc',
-    borderRightWidth: 1,
+  },
+  phoneNumberContainer: {
+    flex: 1,
+  },
+  phoneNumberInput: {
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    backgroundColor: '#f5f5f5',
   },
   nameRow: {
     flexDirection: 'row',
@@ -561,7 +582,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   continueButton: {
-    marginTop: 30,
     backgroundColor: '#666',
     justifyContent: 'center',
     alignItems: 'center',

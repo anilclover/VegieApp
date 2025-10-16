@@ -6,13 +6,16 @@ import {
   Pressable,
   StyleSheet,
   ViewStyle,
+  Dimensions,
   StyleProp,
+  GestureResponderEvent,
 } from 'react-native';
 
 import {PermissionsAndroid} from 'react-native';
 // import {requestContactsPermission} from './permissions';
 const {ScreenshotModule, ContactsModule} = NativeModules;
 
+const windowWidth = Dimensions.get('window').width;
 export const preventScreenshot = () => {
   try {
     if (ScreenshotModule && ScreenshotModule.preventScreenshot) {
@@ -79,4 +82,33 @@ export const showToastWithGravityAndOffset = (message: string) => {
     50,
   );
 };
- 
+
+export function useSwipe(
+  onSwipeLeft?: () => void,
+  onSwipeRight?: () => void,
+  rangeOffset = 4,
+) {
+  let firstTouchX = 0;
+
+  function onTouchStart(e: GestureResponderEvent) {
+    firstTouchX = e.nativeEvent.pageX;
+  }
+
+  function onTouchEnd(e: GestureResponderEvent) {
+    const releaseX = e.nativeEvent.pageX;
+    const deltaX = releaseX - firstTouchX;
+    const range = windowWidth / rangeOffset;
+
+    // 👉 Swipe right (move finger from left to right)
+    if (deltaX > range) {
+      onSwipeRight?.();
+    }
+
+    // 👈 Swipe left (move finger from right to left)
+    else if (deltaX < -range) {
+      onSwipeLeft?.();
+    }
+  }
+
+  return {onTouchStart, onTouchEnd};
+}

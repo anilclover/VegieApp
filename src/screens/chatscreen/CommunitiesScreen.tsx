@@ -16,6 +16,8 @@ const CommunitiesScreen = () => {
       <Button
         title="RegistrationScreenResponsive"
         onPress={() => navigate('Signup')}></Button>
+
+      <Button title="Dashboard" onPress={() => navigate('Dashboard')}></Button>
     </View>
   );
 };

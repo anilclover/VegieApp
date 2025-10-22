@@ -1,5 +1,13 @@
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView, Dimensions} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  TouchableOpacity,
+  Share,
+} from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import {
   DonutChartProps,
@@ -98,33 +106,6 @@ const DonutChart: React.FC<DonutChartProps> = ({data}) => {
   );
 };
 
-// const StatCard: React.FC<StatCardProps> = ({
-//   title,
-//   value,
-//   percentage,
-//   isPositive,
-//   index = 0,
-// }) => {
-//   const isEven = index % 2 === 0;
-//   const percentageColor = isPositive ? '#4CAF50' : '#F44336';
-
-//   // Choose background color based on index
-//   const backgroundColor = isEven ? '#7E57C2' : '#FFB300'; // purple for even, yellow for odd
-//   const textColor = isEven ? '#FFF' : '#000';
-
-//   return (
-//     <View style={[styles.card, {backgroundColor, shadowColor: '#000'}]}>
-//       <Text style={[styles.cardTitle, {color: textColor}]}>{title}</Text>
-//       <Text style={[styles.cardValue, {color: textColor}]}>{value}</Text>
-//       <View style={styles.cardFooter}>
-//         <Text style={{color: percentageColor, fontWeight: 'bold'}}>
-//           {percentage}
-//         </Text>
-//       </View>
-//     </View>
-//   );
-// };
-
 const StatCard: React.FC<StatCardProps> = ({
   title,
   value,
@@ -166,6 +147,8 @@ const TaskRow: React.FC<TaskRowProps> = ({taskName, status, statusColor}) => (
   </View>
 );
 
+
+
 // --- Main Dashboard ---
 const Dashboard: React.FC = () => {
   const statsData: StatCardProps[] = [
@@ -198,9 +181,34 @@ const Dashboard: React.FC = () => {
       iconName: 'battery-charging',
     },
   ];
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        title: 'Check out VegieApp!',
+        message:
+          'Hey! Check out this awesome app: https://brunobarber.com/download',
+        url: 'https://brunobarber.com/download', // iOS only supports "url" key
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          console.log('Shared with activity type:', result.activityType);
+        } else {
+          console.log('Shared successfully!');
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log('Share dismissed');
+      }
+    } catch (error) {
+      console.error('Error while sharing:', error);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
+      <TouchableOpacity onPress={onShare} style={styles.button}>
+        <Text style={styles.buttonText}>Share</Text>
+      </TouchableOpacity>
       <View style={styles.statsGrid}>
         {statsData.map((stat, index) => (
           <StatCard key={index} {...stat} index={index} />
@@ -351,6 +359,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
   },
+  button: {
+    backgroundColor: '#4CAF50',
+    width: '25%',
+    paddingVertical: 12,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    marginBottom: 20,
+  },
+  buttonText: {color: '#fff', fontSize: 16, fontWeight: '600'},
 });
 
 export default Dashboard;

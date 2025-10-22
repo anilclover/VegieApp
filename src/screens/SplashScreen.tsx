@@ -24,7 +24,7 @@ const SplashScreen = () => {
   return (
     <View style={styles.container}>
       {/* <Text style={styles.logo}>VegEase</Text> */}
-      <ActivityIndicator size="large" color="#fff" style={{marginTop: 20}} />
+      {/* <ActivityIndicator size="large" color="#fff" style={{marginTop: 20}} /> */}
       {/* <Image
         source={{
           uri: 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif',
@@ -40,6 +40,7 @@ const SplashScreen = () => {
         style={StyleSheet.absoluteFill} // Fills the entire screen
         resizeMode="cover" // "cover" keeps aspect ratio, fills screen
       />
+      <Text style={styles.textSyle}>Clover Infotech Pvt. Ltd. </Text>
     </View>
   );
 };
@@ -57,5 +58,10 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  textSyle: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: 'white',
   },
 });

@@ -37,6 +37,8 @@ const SMSScreen = () => {
     const subscription = DeviceEventEmitter.addListener(
       'OtpReceived',
       (receivedOtp: string) => {
+        
+        console.log('Received OTP:', receivedOtp);
         const otpArray = receivedOtp.slice(0, length).split('');
         setOtp(otpArray);
       },

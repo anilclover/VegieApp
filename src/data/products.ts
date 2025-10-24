@@ -711,10 +711,11 @@ export const productsData = [
 ];
 
 export const projectStatusData = [
-  {label: 'Completed', percentage: '57.6', color: '#000'},
-  {label: 'In Progress', percentage: '26.4', color: '#4CAF50'},
-  {label: 'Behind', percentage: '6', color: '#7E57C2'},
+  {label: 'Completed', percentage: '40', color: '#000'},
+  {label: 'In Progress', percentage: '15', color: '#4CAF50'},
+  {label: 'Behind', percentage: '30', color: '#7E57C2'},
   {label: 'In Queue', percentage: '10', color: 'pink'},
+  {label: 'In ', percentage: '5', color: 'red'},
 ];
 
 export const tasksData = [
@@ -723,7 +724,36 @@ export const tasksData = [
   {name: 'App design and developm...', status: 'Pending', color: '#00B0FF'},
   {name: 'Poster illustration design', status: 'Approved', color: '#FFB300'},
 ];
-
+export const statsData: StatCardProps[] = [
+  {
+    title: 'Total Projects',
+    value: '29',
+    percentage: '+11.02%',
+    isPositive: true,
+    iconName: 'folder',
+  },
+  {
+    title: 'Total Tasks',
+    value: '715',
+    percentage: '-0.03%',
+    isPositive: false,
+    iconName: 'list',
+  },
+  {
+    title: 'Members',
+    value: '31',
+    percentage: '+15.03%',
+    isPositive: true,
+    iconName: 'users',
+  },
+  {
+    title: 'Productivity',
+    value: '93.8%',
+    percentage: '+6.08%',
+    isPositive: true,
+    iconName: 'battery-charging',
+  },
+];
 // --- Stat Card Component ---
 export type StatCardProps = {
   title: string;
@@ -739,6 +769,14 @@ export type TaskRowProps = {
   status: string;
   statusColor: string;
 };
+
+export const pieData = [
+  {label: 'Sandwiches', value: 40, color: '#90EE90'},
+  {label: 'Salad', value: 20, color: '#FFD700'},
+  {label: 'Soup', value: 15, color: '#FFA500'},
+  {label: 'Beverages', value: 10, color: '#87CEEB'},
+  {label: 'Desserts', value: 15, color: 'red'},
+];
 
 export type DonutChartProps = {
   data: Array<{label: string; percentage: string; color: string}>;

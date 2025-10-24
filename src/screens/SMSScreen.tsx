@@ -37,7 +37,6 @@ const SMSScreen = () => {
     const subscription = DeviceEventEmitter.addListener(
       'OtpReceived',
       (receivedOtp: string) => {
-        
         console.log('Received OTP:', receivedOtp);
         const otpArray = receivedOtp.slice(0, length).split('');
         setOtp(otpArray);
@@ -84,6 +83,8 @@ const SMSScreen = () => {
               }}
               style={styles.otpInput}
               keyboardType="numeric"
+              textContentType="oneTimeCode" // This is the key for iOS OTP autofill
+              autoComplete="sms-otp"
               maxLength={1}
               value={digit}
             />

@@ -7,15 +7,21 @@ import {
   Dimensions,
   TouchableOpacity,
   Share,
+  Platform,
 } from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import {
   DonutChartProps,
   StatCardProps,
   TaskRowProps,
+  pieData,
   projectStatusData,
+  statsData,
   tasksData,
 } from '../data/products';
+import CustomBarGraph from '../components/CustomBarGraph';
+import CircleGraph from '../components/CircleGraph';
+import GradientListScreen from '../components/GradientListScreen';
 
 // --- Donut Chart (using react-native-svg, not a chart lib) ---
 
@@ -147,47 +153,15 @@ const TaskRow: React.FC<TaskRowProps> = ({taskName, status, statusColor}) => (
   </View>
 );
 
-
-
 // --- Main Dashboard ---
 const Dashboard: React.FC = () => {
-  const statsData: StatCardProps[] = [
-    {
-      title: 'Total Projects',
-      value: '29',
-      percentage: '+11.02%',
-      isPositive: true,
-      iconName: 'folder',
-    },
-    {
-      title: 'Total Tasks',
-      value: '715',
-      percentage: '-0.03%',
-      isPositive: false,
-      iconName: 'list',
-    },
-    {
-      title: 'Members',
-      value: '31',
-      percentage: '+15.03%',
-      isPositive: true,
-      iconName: 'users',
-    },
-    {
-      title: 'Productivity',
-      value: '93.8%',
-      percentage: '+6.08%',
-      isPositive: true,
-      iconName: 'battery-charging',
-    },
-  ];
   const onShare = async () => {
     try {
       const result = await Share.share({
         title: 'Check out VegieApp!',
         message:
           'Hey! Check out this awesome app: https://brunobarber.com/download',
-        url: 'https://brunobarber.com/download', // iOS only supports "url" key
+        url: 'https://vegieapp.com/download', // iOS only supports "url" key
       });
 
       if (result.action === Share.sharedAction) {
@@ -206,41 +180,53 @@ const Dashboard: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity onPress={onShare} style={styles.button}>
-        <Text style={styles.buttonText}>Share</Text>
-      </TouchableOpacity>
-      <View style={styles.statsGrid}>
-        {statsData.map((stat, index) => (
-          <StatCard key={index} {...stat} index={index} />
-        ))}
-      </View>
+      <View style={{marginBottom: 30}}>
+        <TouchableOpacity onPress={onShare} style={styles.button}>
+          <Text style={styles.buttonText}>Share</Text>
+        </TouchableOpacity>
+        <View style={styles.statsGrid}>
+          {statsData.map((stat, index) => (
+            <StatCard key={index} {...stat} index={index} />
+          ))}
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Project Status</Text>
-        <View style={styles.chartAndLegendContainer}>
-          <DonutChart data={projectStatusData} />
-          <View style={styles.legend}>
-            {projectStatusData.map((item, index) => (
-              <View key={index} style={styles.legendItem}>
-                <Text style={{color: item.color, fontSize: 18}}>{'●'}</Text>
-                <Text style={styles.legendText}>{item.label}</Text>
-                <Text style={styles.legendPercentage}>{item.percentage}%</Text>
-              </View>
-            ))}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Project Status</Text>
+          <View style={styles.chartAndLegendContainer}>
+            <DonutChart data={projectStatusData} />
+            <View style={styles.legend}>
+              {projectStatusData.map((item, index) => (
+                <View key={index} style={styles.legendItem}>
+                  <Text style={{color: item.color, fontSize: 18}}>{'●'}</Text>
+                  <Text style={styles.legendText}>{item.label}</Text>
+                  <Text style={styles.legendPercentage}>
+                    {item.percentage}%
+                  </Text>
+                </View>
+              ))}
+            </View>
           </View>
         </View>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Tasks</Text>
-        {tasksData.map((task, index) => (
-          <TaskRow
-            key={index}
-            taskName={task.name}
-            status={task.status}
-            statusColor={task.color}
-          />
-        ))}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Tasks</Text>
+          {tasksData.map((task, index) => (
+            <TaskRow
+              key={index}
+              taskName={task.name}
+              status={task.status}
+              statusColor={task.color}
+            />
+          ))}
+        </View>
+
+        <Text style={{fontSize: 18, fontWeight: 'bold', margin: 16}}>
+          Monthly Readings
+        </Text>
+        <CustomBarGraph />
+
+        <CircleGraph data={pieData} size={250} centerText="Pie center text!" />
+        <GradientListScreen />
       </View>
     </ScrollView>
   );
@@ -255,8 +241,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F7F7F7',
-    paddingTop: 50,
+    paddingTop: 20,
+    paddingBottom: 40,
   },
+
   header: {
     alignItems: 'center',
     marginBottom: 20,
@@ -301,7 +289,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginHorizontal: 16,
     padding: 20,
-    marginBottom: 20,
+    marginBottom: 40,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.05,
@@ -361,15 +349,20 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#4CAF50',
-    width: '25%',
     paddingVertical: 12,
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
-    paddingHorizontal: 30,
+    paddingHorizontal: 20, // spacing around text
     borderRadius: 25,
+    alignSelf: 'flex-end', // center button without fixed width
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 20,
+    marginRight:20,
   },
-  buttonText: {color: '#fff', fontSize: 16, fontWeight: '600'},
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
 
 export default Dashboard;

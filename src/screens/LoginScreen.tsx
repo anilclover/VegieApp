@@ -42,8 +42,11 @@ const LoginScreen = () => {
   const scrollY = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation();
   useEffect(() => {
-    // configureGoogleSignIn('YOUR_WEB_CLIENT_ID.apps.googleusercontent.com'); // Only once in the app
-    configureGoogleSignIn('1234567890-abcdefg.apps.googleusercontent.com');
+    if (Platform.OS === 'ios') {
+      // configureGoogleSignIn('YOUR_WEB_CLIENT_ID.apps.googleusercontent.com'); // Only once in the app
+    } else {
+      configureGoogleSignIn('1234567890-abcdefg.apps.googleusercontent.com');
+    }
 
     Animated.loop(
       Animated.timing(scrollY, {
@@ -65,9 +68,9 @@ const LoginScreen = () => {
         Alert.alert('Login Failed', result.error);
       }
     } else {
-      // const user = await signInWithApple();
-      // Alert.alert('Welcome', user.fullName?.givenName || 'Apple User');
-      // navigation.navigate('Main' as never);
+      const user = await signInWithApple();
+      Alert.alert('Welcome', user.fullName?.givenName || 'Apple User');
+      navigation.navigate('Main' as never);
     }
   };
 
